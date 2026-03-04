@@ -1,0 +1,1832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ICDS Decision Support Platform — Andhra Pradesh</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<style>
+  :root{
+    --bg:#f0f2f5;--surface:#fff;--surface2:#fafbfc;--border:#d4dae3;--border-light:#eaecf0;
+    --txt:#0d1b2a;--txt2:#455668;--txt3:#8695a4;
+    --blue:#1a5f7a;--blue-lt:#e6f3f8;--blue-md:#2a8ab0;--blue-dk:#0e3d50;
+    --green:#166b3e;--green-lt:#e6f5ee;--green-md:#1a9d57;
+    --amber:#7a5210;--amber-lt:#fef7e6;
+    --red:#8b1a1a;--red-lt:#fdf0f0;
+    --orange:#8b4a10;
+    --purple:#6b3fa0;--purple-lt:#f2eeff;
+    --sidebar:250px;--hdr:64px;
+    --font:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono',monospace;
+    --r:8px;--r-lg:12px;--r-xl:16px;
+    --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+    --sh-md:0 4px 16px rgba(0,0,0,.08);
+    --sh-lg:0 10px 40px rgba(0,0,0,.12);
+    --sh-xl:0 20px 60px rgba(0,0,0,.15);
+    --grad-blue:linear-gradient(135deg,#1a5f7a 0%,#2a8ab0 100%);
+    --grad-green:linear-gradient(135deg,#166b3e 0%,#1a9d57 100%);
+    --grad-red:linear-gradient(135deg,#8b1a1a 0%,#c0392b 100%);
+    --grad-purple:linear-gradient(135deg,#6b3fa0 0%,#9b59b6 100%);
+    --grad-orange:linear-gradient(135deg,#d4711a 0%,#e67e22 100%);
+    --grad-dark:linear-gradient(135deg,#0d1b2a 0%,#1a3a50 50%,#0d1b2a 100%);
+    --transition:all .25s cubic-bezier(.4,0,.2,1);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--font);background:var(--bg);color:var(--txt);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+
+  /* === LOGIN === */
+  #login-screen{min-height:100vh;background:var(--grad-dark);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  #login-screen::before{content:'';position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(42,138,176,.15) 0%,transparent 70%);top:-200px;right:-100px;animation:float 8s ease-in-out infinite}
+  #login-screen::after{content:'';position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(22,107,62,.12) 0%,transparent 70%);bottom:-100px;left:-50px;animation:float 10s ease-in-out infinite reverse}
+  @keyframes float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-30px) scale(1.05)}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes slideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+  @keyframes countUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+  @keyframes glow{0%,100%{box-shadow:0 0 5px rgba(42,138,176,.3)}50%{box-shadow:0 0 20px rgba(42,138,176,.5)}}
+
+  .login-box{background:var(--surface);border:1px solid rgba(255,255,255,.1);border-radius:var(--r-xl);width:440px;overflow:hidden;box-shadow:var(--sh-xl);animation:fadeUp .6s ease-out;backdrop-filter:blur(10px)}
+  .login-hdr{background:var(--grad-blue);padding:36px 36px 30px;text-align:center;position:relative;overflow:hidden}
+  .login-hdr::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
+  .login-hdr h1{color:#fff;font-size:16px;font-weight:700;margin-top:14px;position:relative;z-index:1}
+  .login-hdr p{color:rgba(255,255,255,.7);font-size:11px;letter-spacing:.8px;text-transform:uppercase;margin-top:4px;position:relative;z-index:1}
+  .login-body{padding:32px 36px}
+  .fg{margin-bottom:20px}
+  .fg label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--txt2);margin-bottom:7px}
+  .fg input,.fg select{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:14px;color:var(--txt);background:var(--bg);outline:none;transition:var(--transition)}
+  .fg input:focus,.fg select:focus{border-color:var(--blue-md);background:#fff;box-shadow:0 0 0 3px rgba(42,138,176,.12)}
+  .btn-login{width:100%;padding:13px;background:var(--grad-blue);color:#fff;border:none;border-radius:var(--r);font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:var(--transition);letter-spacing:.3px}
+  .btn-login:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(26,95,122,.3)}
+  .btn-login:active{transform:translateY(0)}
+  .login-note{text-align:center;font-size:11px;color:var(--txt3);margin-top:16px;font-weight:500}
+  .login-feature-bar{display:flex;gap:16px;justify-content:center;margin-top:20px;padding-top:20px;border-top:1px solid var(--border-light)}
+  .login-feature{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--txt3);font-weight:500}
+  .login-feature svg{color:var(--green-md)}
+
+  /* === APP SHELL === */
+  #app{display:none;min-height:100vh}
+  .app-hdr{position:fixed;top:0;left:0;right:0;height:var(--hdr);background:var(--grad-blue);display:flex;align-items:center;padding:0 24px;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+  .hdr-emblem{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;margin-right:14px;flex-shrink:0;transition:var(--transition);animation:glow 3s ease-in-out infinite}
+  .hdr-emblem:hover{transform:rotate(180deg)}
+  .hdr-title h1{color:#fff;font-size:15px;font-weight:700;letter-spacing:.2px}
+  .hdr-title p{color:rgba(255,255,255,.6);font-size:10px;text-transform:uppercase;letter-spacing:.8px;margin-top:2px}
+  .hdr-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+  .hdr-live{display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,.7);font-weight:500}
+  .live-dot{width:8px;height:8px;border-radius:50%;background:#2ecc71;animation:pulse 2s ease-in-out infinite}
+  .role-badge{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.22);border-radius:20px;padding:5px 14px;color:#fff;font-size:12px;font-weight:600;backdrop-filter:blur(4px)}
+  .btn-theme{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-size:16px;transition:var(--transition)}
+  .btn-theme:hover{background:rgba(255,255,255,.2)}
+  .btn-logout{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);border-radius:var(--r);color:#fff;font-size:12px;font-weight:600;padding:7px 16px;cursor:pointer;font-family:var(--font);transition:var(--transition);display:flex;align-items:center;gap:6px}
+  .btn-logout:hover{background:rgba(255,255,255,.22);transform:translateY(-1px)}
+
+  /* === SIDEBAR === */
+  .app-sb{position:fixed;top:var(--hdr);left:0;width:var(--sidebar);height:calc(100vh - var(--hdr));background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;z-index:90;transition:var(--transition)}
+  .app-sb::-webkit-scrollbar{width:4px}.app-sb::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+  .nav-sec{padding:16px 0 8px}
+  .nav-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--txt3);padding:0 20px 8px}
+  .nav-item{display:flex;align-items:center;gap:11px;padding:10px 20px;cursor:pointer;color:var(--txt2);font-size:13px;font-weight:500;transition:var(--transition);border-left:3px solid transparent;position:relative}
+  .nav-item:hover{background:var(--bg);color:var(--txt);padding-left:24px}
+  .nav-item.active{background:var(--blue-lt);color:var(--blue);border-left-color:var(--blue);font-weight:700}
+  .nav-item.active::after{content:'';position:absolute;right:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--blue);border-radius:2px 0 0 2px}
+  .nav-ico{width:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+  .nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;min-width:20px;text-align:center}
+
+  /* === MAIN AREA === */
+  .app-main{margin-left:var(--sidebar);margin-top:var(--hdr);padding:28px;min-height:calc(100vh - var(--hdr));transition:var(--transition)}
+  .page{display:none;animation:fadeUp .3s ease-out}.page.active{display:block}
+  .pg-hdr{margin-bottom:24px}
+  .pg-hdr h2{font-size:22px;font-weight:800;letter-spacing:-.3px}
+  .pg-hdr p{font-size:13px;color:var(--txt2);margin-top:4px;font-weight:400}
+  .breadcrumb{font-size:12px;color:var(--txt3);margin-bottom:14px;font-weight:500}
+  .breadcrumb span{cursor:pointer;transition:var(--transition)}.breadcrumb span:hover{color:var(--blue);text-decoration:underline}
+
+  /* === STAT CARDS === */
+  .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-bottom:24px}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;box-shadow:var(--sh);border-top:3px solid var(--border);transition:var(--transition);position:relative;overflow:hidden}
+  .stat-card:hover{transform:translateY(-3px);box-shadow:var(--sh-md)}
+  .stat-card::after{content:'';position:absolute;top:0;right:0;width:60px;height:60px;border-radius:0 0 0 60px;opacity:.06}
+  .c-critical{border-top-color:#c0392b!important}.c-critical::after{background:#c0392b}
+  .c-high{border-top-color:#d4711a!important}.c-high::after{background:#d4711a}
+  .c-medium{border-top-color:#d4a017!important}.c-medium::after{background:#d4a017}
+  .c-low{border-top-color:var(--green)!important}.c-low::after{background:var(--green)}
+  .c-blue{border-top-color:var(--blue-md)!important}.c-blue::after{background:var(--blue-md)}
+  .c-purple{border-top-color:#6b3fa0!important}.c-purple::after{background:#6b3fa0}
+  .sl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--txt3)}
+  .sv{font-size:32px;font-weight:800;font-family:var(--mono);margin:6px 0 4px;letter-spacing:-1px}
+  .ss{font-size:12px;color:var(--txt2);font-weight:400}
+  .stat-trend{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;margin-top:4px;padding:2px 8px;border-radius:10px}
+  .trend-up{background:var(--green-lt);color:var(--green)}.trend-down{background:var(--red-lt);color:var(--red)}.trend-flat{background:var(--bg);color:var(--txt3)}
+
+  /* === SECTION CARDS === */
+  .sc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:20px;box-shadow:var(--sh);transition:var(--transition);overflow:hidden}
+  .sc:hover{box-shadow:var(--sh-md)}
+  .sc-hdr{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface2)}
+  .sc-hl h3{font-size:14px;font-weight:700;letter-spacing:-.1px}.sc-hl p{font-size:12px;color:var(--txt2);margin-top:3px}
+  .sc-body{padding:20px 24px}
+  .chart-container{position:relative;width:100%;height:300px}
+  .chart-container-sm{position:relative;width:100%;height:250px}
+  .chart-container-lg{position:relative;width:100%;height:380px}
+
+  /* === BADGES === */
+  .badge{display:inline-block;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;font-family:var(--mono)}
+  .bg-critical{background:#fdf0f0;color:#c0392b;border:1px solid #f5c6c6}.bg-high{background:#fdf3ed;color:#c0622b;border:1px solid #f5d0b5}.bg-medium{background:#fef9ed;color:#9a6f1a;border:1px solid #f5e0a0}.bg-low{background:var(--green-lt);color:var(--green);border:1px solid #b5ddc7}.bg-pending{background:#fef9ed;color:#9a6f1a;border:1px solid #f5e0a0}.bg-inprogress{background:var(--blue-lt);color:var(--blue);border:1px solid #b5d8e8}.bg-completed{background:var(--green-lt);color:var(--green);border:1px solid #b5ddc7}.bg-treat{background:#f2eeff;color:#6b3fa0;border:1px solid #d4c5f9}.bg-worsened{background:#fdf0f0;color:#c0392b;border:1px solid #f5c6c6}.bg-same{background:var(--bg);color:var(--txt2);border:1px solid var(--border)}.bg-improved{background:var(--green-lt);color:var(--green);border:1px solid #b5ddc7}
+
+  /* === BUTTONS === */
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--r);font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;border:none;transition:var(--transition);white-space:nowrap}
+  .btn:hover{transform:translateY(-1px)}
+  .btn-pri{background:var(--grad-blue);color:#fff;box-shadow:0 2px 8px rgba(26,95,122,.25)}.btn-pri:hover{box-shadow:0 4px 12px rgba(26,95,122,.35)}
+  .btn-sec{background:var(--surface);color:var(--txt);border:1.5px solid var(--border)}.btn-sec:hover{background:var(--bg);border-color:var(--blue-md)}
+  .btn-success{background:var(--grad-green);color:#fff;box-shadow:0 2px 8px rgba(22,107,62,.25)}
+  .btn-danger{background:var(--red-lt);color:var(--red);border:1px solid #f5c6c6}
+  .btn-sm{padding:5px 12px;font-size:11px}
+  .btn-icon{width:34px;height:34px;padding:0;justify-content:center;border-radius:50%}
+
+  /* === TABLE === */
+  .tw{overflow-x:auto;border-radius:var(--r)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  thead th{background:var(--bg);padding:10px 14px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--txt2);border-bottom:2px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;transition:var(--transition)}
+  thead th:hover{background:#e4e8ed;color:var(--blue)}
+  tbody tr{border-bottom:1px solid var(--border-light);transition:var(--transition)}
+  tbody tr:hover{background:var(--blue-lt)}
+  tbody td{padding:11px 14px;vertical-align:middle}
+
+  /* === FILTER BAR === */
+  .fbar{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+  .fbar input,.fbar select{padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:13px;background:var(--surface);color:var(--txt);outline:none;transition:var(--transition)}
+  .fbar input:focus,.fbar select:focus{border-color:var(--blue-md);box-shadow:0 0 0 3px rgba(42,138,176,.1)}
+  .fbar input{flex:1;min-width:180px}
+
+  /* === LAYOUTS === */
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px}
+  .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px}
+  .ii{padding:14px 16px;border:1px solid var(--border-light);border-radius:var(--r);background:var(--bg);transition:var(--transition)}
+  .ii:hover{border-color:var(--blue-md);background:var(--blue-lt)}
+  .ii-l{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--txt3);margin-bottom:4px}
+  .ii-v{font-size:15px;font-weight:700;color:var(--txt)}
+  .dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:12px}
+  .di{border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center;transition:var(--transition)}
+  .di:hover{transform:translateY(-2px);box-shadow:var(--sh)}
+  .dc{font-size:14px;font-weight:700;font-family:var(--mono);margin-bottom:3px}
+  .dn{font-size:11px;color:var(--txt3);margin-bottom:10px}
+
+  /* === PROGRESS / SCORES === */
+  .prog-item{margin-bottom:14px}
+  .prog-info{display:flex;justify-content:space-between;margin-bottom:6px;font-size:12px}
+  .prog-wrap{background:var(--bg);border-radius:4px;height:10px;border:1px solid var(--border);overflow:hidden}
+  .prog-bar{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+  .score-row{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+  .score-lbl{font-size:13px;color:var(--txt2);width:170px;flex-shrink:0;font-weight:500}
+  .score-bw{flex:1;background:var(--bg);border-radius:4px;height:10px;overflow:hidden}
+  .score-b{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+  .score-b.pre{background:var(--grad-orange)}.score-b.post{background:var(--grad-green)}
+  .score-n{font-family:var(--mono);font-size:14px;font-weight:700;width:42px;text-align:right}
+
+  /* === ALERTS === */
+  .al-list{display:flex;flex-direction:column;gap:10px}
+  .al-item{display:flex;align-items:flex-start;gap:14px;padding:14px 18px;border:1px solid var(--border);border-radius:var(--r);background:var(--surface);cursor:pointer;transition:var(--transition);border-left:4px solid var(--border)}
+  .al-item:hover{box-shadow:var(--sh-md);transform:translateX(4px)}
+  .al-item.al-critical{border-left-color:#c0392b}.al-item.al-worsened{border-left-color:#6b3fa0}.al-item.al-high{border-left-color:#d4711a}
+  .al-ico{flex-shrink:0;margin-top:2px}
+  .al-title{font-size:13px;font-weight:700}.al-meta{font-size:12px;color:var(--txt2);margin-top:4px}
+
+  /* === WORKFORCE CARDS === */
+  .wf-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+  .wf-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;box-shadow:var(--sh);transition:var(--transition)}
+  .wf-card:hover{transform:translateY(-2px);box-shadow:var(--sh-md)}
+  .wf-card h4{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--txt3);margin-bottom:12px}
+  .wf-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border-light);font-size:13px}
+  .wf-row:last-child{border:none}.wf-v{font-family:var(--mono);font-weight:700}
+  .bar-chart::after{content:'';position:absolute;bottom:26px;left:0;right:0;border-top:1px dashed var(--border)}
+  .bar-col{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1}
+  .bar-b{width:100%;border-radius:4px 4px 0 0;min-height:4px;transition:height .6s cubic-bezier(.4,0,.2,1)}
+  .bar-v{font-size:11px;font-family:var(--mono);font-weight:700;color:var(--txt2)}
+  .bar-l{font-size:11px;color:var(--txt3);text-align:center}
+
+  /* === MODAL === */
+  .modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+  .modal-ov.open{display:flex}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);width:480px;max-width:95vw;box-shadow:var(--sh-xl);animation:fadeUp .3s ease-out}
+  .modal-hdr{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .modal-hdr h3{font-size:15px;font-weight:700}
+  .modal-close{background:none;border:none;cursor:pointer;color:var(--txt3);font-size:22px;line-height:1;transition:var(--transition)}
+  .modal-close:hover{color:var(--red);transform:rotate(90deg)}
+  .modal-body{padding:24px}.modal-foot{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px}
+
+  /* === TOAST === */
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--txt);color:#fff;padding:14px 20px;border-radius:var(--r);font-size:13px;font-weight:600;box-shadow:var(--sh-lg);z-index:9999;opacity:0;transform:translateY(10px);transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;display:flex;align-items:center;gap:8px}
+  .toast.show{opacity:1;transform:translateY(0)}
+  .toast.success{background:var(--green)}
+  .toast.error{background:#c0392b}
+
+  /* === UTILITIES === */
+  .mono{font-family:var(--mono)}.txt3{color:var(--txt3)}.txt-sm{font-size:12px}
+  .mt-10{margin-top:10px}.mt-16{margin-top:16px}.mt-24{margin-top:24px}
+  .flex{display:flex}.ic{align-items:center}.jb{justify-content:space-between}
+  .dpill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:var(--blue-lt);color:var(--blue);border:1px solid #b5d8e8}
+
+  /* === REPORT STYLES === */
+  .report-controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:20px;padding:18px 24px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-lg)}
+  .report-controls label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--txt3)}
+  .report-controls select,.report-controls input{padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:13px}
+  .exec-summary{background:linear-gradient(135deg,#0d1b2a 0%,#1a3a50 100%);color:#fff;border-radius:var(--r-lg);padding:32px;margin-bottom:24px;position:relative;overflow:hidden}
+  .exec-summary::before{content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;border-radius:50%;background:rgba(42,138,176,.15)}
+  .exec-summary h3{font-size:18px;font-weight:800;margin-bottom:16px;position:relative}
+  .exec-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;margin-top:16px;position:relative}
+  .exec-kpi-item{text-align:center;padding:14px;background:rgba(255,255,255,.08);border-radius:var(--r);border:1px solid rgba(255,255,255,.1)}
+  .exec-kpi-val{font-size:28px;font-weight:800;font-family:var(--mono)}
+  .exec-kpi-lbl{font-size:11px;opacity:.7;margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
+
+  /* === ANALYTICS HERO === */
+  .analytics-hero{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+  .hero-card{background:var(--surface);border-radius:var(--r-lg);padding:20px;box-shadow:var(--sh);position:relative;overflow:hidden;transition:var(--transition)}
+  .hero-card:hover{transform:translateY(-4px);box-shadow:var(--sh-lg)}
+  .hero-card .hero-icon{width:44px;height:44px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+  .hero-card .hero-val{font-size:28px;font-weight:800;font-family:var(--mono);letter-spacing:-1px}
+  .hero-card .hero-lbl{font-size:12px;color:var(--txt2);margin-top:2px;font-weight:500}
+  .hero-card .hero-change{font-size:11px;font-weight:700;margin-top:8px;display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:10px}
+
+  /* === PRINT === */
+  @media print{
+    .app-hdr,.app-sb,.btn,.fbar,.nav-item,.btn-logout,.hdr-right{display:none!important}
+    .app-main{margin:0!important;padding:20px!important}
+    .sc{break-inside:avoid;box-shadow:none!important;border:1px solid #ddd!important}
+    .page{display:block!important}
+    body{background:#fff!important}
+  }
+
+  @media(max-width:1024px){.analytics-hero{grid-template-columns:repeat(2,1fr)}.three-col{grid-template-columns:1fr}}
+  @media(max-width:768px){.app-sb{display:none}.app-main{margin-left:0}.two-col{grid-template-columns:1fr}.analytics-hero{grid-template-columns:1fr}.stats-row{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<!-- SVG SYMBOL DEFS -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="s-emblem" viewBox="0 0 40 40">
+    <circle cx="20" cy="20" r="17" fill="none" stroke="currentColor" stroke-width="1.5"/>
+    <circle cx="20" cy="20" r="3.5" fill="currentColor"/>
+    <line x1="20" y1="3" x2="20" y2="9" stroke="currentColor" stroke-width="1.5"/><line x1="20" y1="31" x2="20" y2="37" stroke="currentColor" stroke-width="1.5"/>
+    <line x1="3" y1="20" x2="9" y2="20" stroke="currentColor" stroke-width="1.5"/><line x1="31" y1="20" x2="37" y2="20" stroke="currentColor" stroke-width="1.5"/>
+    <line x1="6.9" y1="6.9" x2="11.3" y2="11.3" stroke="currentColor" stroke-width="1.4"/><line x1="28.7" y1="28.7" x2="33.1" y2="33.1" stroke="currentColor" stroke-width="1.4"/>
+    <line x1="33.1" y1="6.9" x2="28.7" y2="11.3" stroke="currentColor" stroke-width="1.4"/><line x1="11.3" y1="28.7" x2="6.9" y2="33.1" stroke="currentColor" stroke-width="1.4"/>
+    <circle cx="20" cy="3" r="1.4" fill="currentColor"/><circle cx="20" cy="37" r="1.4" fill="currentColor"/>
+    <circle cx="3" cy="20" r="1.4" fill="currentColor"/><circle cx="37" cy="20" r="1.4" fill="currentColor"/>
+  </symbol>
+  <symbol id="s-dash" viewBox="0 0 20 20"><rect x="2" y="2" width="7" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="11" y="2" width="7" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="2" y="11" width="7" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="11" y="11" width="7" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+  <symbol id="s-alert" viewBox="0 0 20 20"><path d="M10 2.5l7.5 13H2.5L10 2.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><line x1="10" y1="8.5" x2="10" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="10" cy="13.5" r="1" fill="currentColor"/></symbol>
+  <symbol id="s-child" viewBox="0 0 20 20"><circle cx="10" cy="5.5" r="2.8" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M4 18c0-3.3 2.7-6 6-6s6 2.7 6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="s-chart" viewBox="0 0 20 20"><polyline points="2,15 7,9 11,12 18,4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><line x1="2" y1="18" x2="18" y2="18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="s-workforce" viewBox="0 0 20 20"><circle cx="7" cy="6" r="2.4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M2 17c0-2.8 2.2-5 5-5s5 2.2 5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="14.5" cy="6" r="2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M13 17c0-2 1.1-3.7 2.7-4.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+  <symbol id="s-out" viewBox="0 0 20 20"><path d="M8 3H4a1 1 0 00-1 1v12a1 1 0 001 1h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><polyline points="13,7 17,10 13,13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="7" y1="10" x2="17" y2="10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="s-bell" viewBox="0 0 20 20"><path d="M10 2a6 6 0 016 6c0 3 1.5 4.5 2 5H2c.5-.5 2-2 2-5a6 6 0 016-6z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 15a2 2 0 004 0" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+  <symbol id="s-upd" viewBox="0 0 20 20"><path d="M3 10a7 7 0 107-7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><polyline points="3,4 3,10 9,10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="s-ok" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.6"/><polyline points="6,10 9,13 14,7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-hdr">
+      <svg width="52" height="52" viewBox="0 0 40 40" color="rgba(255,255,255,.9)"><use href="#s-emblem"/></svg>
+      <h1>ICDS Decision Support Platform</h1>
+      <p>Andhra Pradesh · Integrated Child Development Services</p>
+    </div>
+    <div class="login-body">
+      <div class="fg"><label>User ID</label><input id="l-uid" type="text" value="AWW-AP-001"/></div>
+      <div class="fg"><label>Password</label><input id="l-pwd" type="password" value="••••••"/></div>
+      <div class="fg"><label>Login Role</label>
+        <select id="l-role">
+          <option value="aww">Anganwadi Worker (AWW)</option>
+          <option value="supervisor">Supervisor / CDPO</option>
+          <option value="admin">Administrator</option>
+        </select>
+      </div>
+      <button class="btn-login" onclick="doLogin()">Sign In to Portal</button>
+      <div class="login-feature-bar">
+        <div class="login-feature"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><use href="#s-chart"/></svg>Analytics</div>
+        <div class="login-feature"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><use href="#s-ok"/></svg>Real-time</div>
+        <div class="login-feature"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><use href="#s-child"/></svg>1000+ Children</div>
+      </div>
+      <p class="login-note">ECD Innovation Challenge · AP State Dataset · Powered by AI-driven Analytics</p>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header class="app-hdr">
+    <div class="hdr-emblem"><svg width="26" height="26" viewBox="0 0 40 40" color="rgba(255,255,255,.9)"><use href="#s-emblem"/></svg></div>
+    <div class="hdr-title">
+      <h1>ICDS Decision Support Platform</h1>
+      <p>Integrated Child Development Services — Government of Andhra Pradesh</p>
+    </div>
+    <div class="hdr-right">
+      <div class="hdr-live"><div class="live-dot"></div>Live Data</div>
+      <div class="role-badge" id="role-badge">AWW</div>
+      <button class="btn-theme" onclick="toggleFullscreen()" title="Toggle Fullscreen">⛶</button>
+      <button class="btn-logout" onclick="doLogout()">
+        <svg width="14" height="14" viewBox="0 0 20 20" color="rgba(255,255,255,.85)"><use href="#s-out"/></svg>Sign Out
+      </button>
+    </div>
+  </header>
+
+  <aside class="app-sb">
+    <div class="nav-sec">
+      <div class="nav-lbl">Main</div>
+      <div class="nav-item active" id="nav-dashboard" onclick="navigate('dashboard')">
+        <span class="nav-ico"><svg width="17" height="17" viewBox="0 0 20 20"><use href="#s-dash"/></svg></span>Dashboard
+      </div>
+      <div class="nav-item" id="nav-alerts" onclick="navigate('alerts')">
+        <span class="nav-ico"><svg width="17" height="17" viewBox="0 0 20 20"><use href="#s-alert"/></svg></span>Alerts &amp; Referrals
+        <span class="nav-badge">8</span>
+      </div>
+      <div class="nav-item" id="nav-children" onclick="navigate('children')">
+        <span class="nav-ico"><svg width="17" height="17" viewBox="0 0 20 20"><use href="#s-child"/></svg></span>Child Records
+      </div>
+    </div>
+    <div class="nav-sec">
+      <div class="nav-lbl">Analytics &amp; Reports</div>
+      <div class="nav-item" id="nav-analytics" onclick="navigate('analytics')">
+        <span class="nav-ico"><svg width="17" height="17" viewBox="0 0 20 20"><use href="#s-chart"/></svg></span>Graph Analytics
+      </div>
+      <div class="nav-item" id="nav-outcomes" onclick="navigate('outcomes')">
+        <span class="nav-ico"><svg width="17" height="17" viewBox="0 0 20 20"><use href="#s-chart"/></svg></span>Outcomes &amp; Impact
+      </div>
+      <div class="nav-item" id="nav-reports" onclick="navigate('reports')">
+        <span class="nav-ico"><svg width="17" height="17" viewBox="0 0 20 20"><use href="#s-ok"/></svg></span>View Reports
+      </div>
+      <div class="nav-item" id="nav-workforce" style="display:none" onclick="navigate('workforce')">
+        <span class="nav-ico"><svg width="17" height="17" viewBox="0 0 20 20"><use href="#s-workforce"/></svg></span>Workforce Monitoring
+      </div>
+    </div>
+    <div class="nav-sec" style="padding:20px;border-top:1px solid var(--border-light);margin-top:auto">
+      <div style="background:var(--blue-lt);border:1px solid #b5d8e8;border-radius:var(--r);padding:14px;text-align:center">
+        <div style="font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.5px">Platform Version</div>
+        <div style="font-size:16px;font-weight:800;color:var(--blue);margin-top:4px;font-family:var(--mono)">v2.5</div>
+        <div style="font-size:10px;color:var(--txt3);margin-top:4px">Last updated: March 4, 2026</div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="app-main">
+
+    <!-- AWW DASHBOARD -->
+    <div class="page active" id="page-dashboard-aww">
+      <div class="pg-hdr"><h2>Today's Work — Priority Actions</h2><p>Children requiring immediate attention · Andhra Pradesh ICDS Programme</p></div>
+      <div class="stats-row">
+        <div class="stat-card c-critical"><div class="sl">High Risk Children</div><div class="sv">8</div><div class="ss">Priority referral to RBSK/DEIC</div><div class="stat-trend trend-down">↓ 22% from baseline</div></div>
+        <div class="stat-card c-high"><div class="sl">Medium Risk Follow-up</div><div class="sv">279</div><div class="ss">Close monitoring required</div><div class="stat-trend trend-flat">→ Stable</div></div>
+        <div class="stat-card c-medium"><div class="sl">Referrals Pending</div><div class="sv">513</div><div class="ss">Awaiting referral action</div><div class="stat-trend trend-down">↓ 8% cleared this week</div></div>
+        <div class="stat-card c-blue"><div class="sl">Total Children</div><div class="sv">1,000</div><div class="ss">4 districts, Andhra Pradesh</div><div class="stat-trend trend-up">↑ 12.4% vs Q3</div></div>
+      </div>
+      <div class="sc">
+        <div class="sc-hdr">
+          <div class="sc-hl"><h3>Priority Action List</h3><p>Sorted by risk — High risk children must be addressed first (score &gt;35 = High Risk)</p></div>
+        </div>
+        <div class="sc-body">
+          <div class="fbar">
+            <input type="text" id="aww-s" placeholder="Search Child ID…" oninput="filterAWW()"/>
+            <select id="aww-r" onchange="filterAWW()"><option value="">All Risk Levels</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option></select>
+            <select id="aww-d" onchange="filterAWW()"><option value="">All Districts</option><option value="Chittoor">Chittoor</option><option value="Eluru">Eluru</option><option value="Guntur">Guntur</option><option value="Visakhapatnam">Visakhapatnam</option></select>
+          </div>
+          <div class="tw"><table id="aww-tbl">
+            <thead><tr>
+              <th onclick="sortAWW('id')">Child ID ↕</th><th>Age</th><th>District</th>
+              <th onclick="sortAWW('risk')">Risk Level ↕</th><th>Referral Type</th>
+              <th>Referral Status</th><th onclick="sortAWW('score')">Score ↕</th>
+              <th>Delays</th><th>Action</th>
+            </tr></thead>
+            <tbody id="aww-tbody"></tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUPERVISOR DASHBOARD -->
+    <div class="page" id="page-dashboard-supervisor">
+      <div class="pg-hdr"><h2>AWC Performance &amp; Risk Overview</h2><p>District-wise screening, risk distribution and referral performance — Andhra Pradesh</p></div>
+      <div class="stats-row">
+        <div class="stat-card c-blue"><div class="sl">Total Screened</div><div class="sv">1,000</div><div class="ss">4 districts — Baseline+Follow-up</div></div>
+        <div class="stat-card c-critical"><div class="sl">High Risk</div><div class="sv">8</div><div class="ss">Priority referral required</div></div>
+        <div class="stat-card c-medium"><div class="sl">Medium Risk</div><div class="sv">279</div><div class="ss">Close monitoring</div></div>
+        <div class="stat-card c-low"><div class="sl">Low Risk</div><div class="sv">713</div><div class="ss">Routine monitoring</div></div>
+        <div class="stat-card c-high"><div class="sl">Pending Referrals</div><div class="sv">513</div><div class="ss">51.3% of all children</div></div>
+      </div>
+      <div class="two-col">
+        <div class="sc">
+          <div class="sc-hdr"><div class="sc-hl"><h3>Screening Coverage by District</h3><p>Children screened per district (total n=1,000)</p></div></div>
+          <div class="sc-body">
+            <div class="prog-item"><div class="prog-info"><span style="font-size:13px;font-weight:500">Eluru</span><span class="mono" style="font-weight:600;color:var(--green)">257 (25.7%)</span></div><div class="prog-wrap"><div class="prog-bar" style="width:72%;background:var(--green)"></div></div></div>
+            <div class="prog-item"><div class="prog-info"><span style="font-size:13px;font-weight:500">Chittoor</span><span class="mono" style="font-weight:600;color:var(--green)">255 (25.5%)</span></div><div class="prog-wrap"><div class="prog-bar" style="width:71%;background:var(--blue-md)"></div></div></div>
+            <div class="prog-item"><div class="prog-info"><span style="font-size:13px;font-weight:500">Visakhapatnam</span><span class="mono" style="font-weight:600;color:var(--green)">254 (25.4%)</span></div><div class="prog-wrap"><div class="prog-bar" style="width:71%;background:var(--blue-md)"></div></div></div>
+            <div class="prog-item"><div class="prog-info"><span style="font-size:13px;font-weight:500">Guntur</span><span class="mono" style="font-weight:600;color:var(--blue-md)">234 (23.4%)</span></div><div class="prog-wrap"><div class="prog-bar" style="width:65%;background:var(--blue-md)"></div></div></div>
+            <div style="margin-top:14px;padding:11px 14px;background:var(--blue-lt);border:1px solid #b5d8e8;border-radius:var(--r)">
+              <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:8px">Assessment Cycles</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center">
+                <div><div class="mono" style="font-size:18px;font-weight:700">580</div><div style="font-size:11px;color:var(--txt2)">Baseline</div></div>
+                <div><div class="mono" style="font-size:18px;font-weight:700">317</div><div style="font-size:11px;color:var(--txt2)">Follow-up</div></div>
+                <div><div class="mono" style="font-size:18px;font-weight:700">103</div><div style="font-size:11px;color:var(--txt2)">Re-screen</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="sc">
+          <div class="sc-hdr"><div class="sc-hl"><h3>Risk Distribution by Age Band</h3><p>Children by age group and risk level (n=1,000)</p></div></div>
+          <div class="sc-body">
+            <table>
+              <thead><tr><th>Age Band</th><th>High Risk</th><th>Medium Risk</th><th>Low Risk</th><th>Total</th></tr></thead>
+              <tbody>
+                <tr><td><strong>0–1 year</strong></td><td><span class="badge bg-high">2</span></td><td><span class="badge bg-medium">46</span></td><td><span class="badge bg-low">124</span></td><td class="mono">172</td></tr>
+                <tr><td><strong>1–3 years</strong></td><td><span class="badge bg-high">4</span></td><td><span class="badge bg-medium">90</span></td><td><span class="badge bg-low">259</span></td><td class="mono">353</td></tr>
+                <tr><td><strong>3–6 years</strong></td><td><span class="badge bg-high">2</span></td><td><span class="badge bg-medium">143</span></td><td><span class="badge bg-low">330</span></td><td class="mono">475</td></tr>
+              </tbody>
+            </table>
+            <div style="margin-top:14px">
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--txt3);margin-bottom:8px">Developmental Delays by Domain</div>
+              <table>
+                <thead><tr><th>Domain</th><th>Children</th><th>%</th></tr></thead>
+                <tbody>
+                  <tr><td>Language &amp; Communication (LC)</td><td class="mono">182</td><td class="mono">18.2%</td></tr>
+                  <tr><td>Gross Motor (GM)</td><td class="mono">146</td><td class="mono">14.6%</td></tr>
+                  <tr><td>Socio-Emotional (SE)</td><td class="mono">137</td><td class="mono">13.7%</td></tr>
+                  <tr><td>Fine Motor (FM)</td><td class="mono">115</td><td class="mono">11.5%</td></tr>
+                  <tr><td>Cognitive (COG)</td><td class="mono">100</td><td class="mono">10.0%</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sc">
+        <div class="sc-hdr"><div class="sc-hl"><h3>District Performance Table</h3><p>District-wise metrics — Review to explore, Escalate for districts with 3+ High Risk</p></div></div>
+        <div class="sc-body"><div class="tw"><table>
+          <thead><tr><th>District</th><th>Screened</th><th>High Risk</th><th>Referrals Pending</th><th>Improvement Rate</th><th>Worsened</th><th>Action</th></tr></thead>
+          <tbody id="sup-tbody"></tbody>
+        </table></div></div>
+      </div>
+    </div>
+
+    <!-- ADMIN DASHBOARD -->
+    <div class="page" id="page-dashboard-admin">
+      <div class="pg-hdr"><h2>System Overview — Administrator</h2><p>Programme-level statistics · Andhra Pradesh ICDS · ECD Dataset (n=1,000)</p></div>
+      <div class="stats-row">
+        <div class="stat-card c-blue"><div class="sl">Total Children</div><div class="sv">1,000</div><div class="ss">4 districts, AP</div></div>
+        <div class="stat-card c-critical"><div class="sl">High Risk</div><div class="sv">8</div><div class="ss">RBSK/DEIC referral needed</div></div>
+        <div class="stat-card c-medium"><div class="sl">Pending Referrals</div><div class="sv">513</div><div class="ss">Awaiting action</div></div>
+        <div class="stat-card c-low"><div class="sl">Improved</div><div class="sv">472</div><div class="ss">47.2% showing improvement</div></div>
+        <div class="stat-card c-purple"><div class="sl">Worsened</div><div class="sv">98</div><div class="ss">9.8% — urgent reassessment</div></div>
+      </div>
+      <div class="two-col">
+        <div class="sc">
+          <div class="sc-hdr"><div class="sc-hl"><h3>Referral Status Overview</h3></div></div>
+          <div class="sc-body">
+            <table>
+              <thead><tr><th>Status</th><th>Count</th><th>Share</th></tr></thead>
+              <tbody>
+                <tr><td><span class="badge bg-pending">Pending</span></td><td class="mono">513</td><td class="mono">51.3%</td></tr>
+                <tr><td><span class="badge bg-completed">Completed</span></td><td class="mono">299</td><td class="mono">29.9%</td></tr>
+                <tr><td><span class="badge bg-treat">Under Treatment</span></td><td class="mono">188</td><td class="mono">18.8%</td></tr>
+                <tr><td><span class="badge bg-high">Triggered (Yes)</span></td><td class="mono">263</td><td class="mono">26.3%</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="sc">
+          <div class="sc-hdr"><div class="sc-hl"><h3>Nutritional Risk Profile</h3></div></div>
+          <div class="sc-body">
+            <table>
+              <thead><tr><th>Condition</th><th>Children</th><th>Share</th></tr></thead>
+              <tbody>
+                <tr><td>Anaemia</td><td class="mono">268</td><td class="mono">26.8%</td></tr>
+                <tr><td>Underweight</td><td class="mono">190</td><td class="mono">19.0%</td></tr>
+                <tr><td>Stunting</td><td class="mono">138</td><td class="mono">13.8%</td></tr>
+                <tr><td>Wasting</td><td class="mono">108</td><td class="mono">10.8%</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALERTS -->
+    <div class="page" id="page-alerts">
+      <div class="pg-hdr"><h2>Alerts &amp; Referrals</h2><p>High-risk, worsened, and pending-referral escalations — click any alert to view child record</p></div>
+      <div class="two-col">
+        <div>
+          <div class="sc">
+            <div class="sc-hdr">
+              <div class="sc-hl"><h3>Active Alerts</h3><p>High-risk, worsened, and pending referral cases</p></div>
+              <select style="font-size:12px;padding:5px 10px;border:1px solid var(--border);border-radius:var(--r);font-family:var(--font)" onchange="filterAlerts(this.value)">
+                <option value="">All Types</option><option value="high-risk">High Risk</option><option value="worsened">Worsened</option><option value="pending">Pending Referral</option>
+              </select>
+            </div>
+            <div class="sc-body"><div class="al-list" id="al-list"></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="sc">
+            <div class="sc-hdr"><div class="sc-hl"><h3>Alert Summary</h3><p>Programme-wide escalation counts</p></div></div>
+            <div class="sc-body">
+              <div class="stats-row" style="grid-template-columns:1fr 1fr">
+                <div class="stat-card c-critical"><div class="sl">High Risk</div><div class="sv">8</div></div>
+                <div class="stat-card c-high"><div class="sl">Pending Referral</div><div class="sv">513</div></div>
+                <div class="stat-card c-purple"><div class="sl">Worsened</div><div class="sv">98</div></div>
+                <div class="stat-card c-low"><div class="sl">Completed</div><div class="sv">299</div></div>
+              </div>
+              <div style="margin-top:6px;padding:12px 14px;background:var(--amber-lt);border:1px solid #f5d898;border-radius:var(--r)">
+                <div style="font-size:12px;font-weight:700;color:var(--amber)">Referral Protocol</div>
+                <div style="font-size:12px;margin-top:6px;line-height:1.75">
+                  <div>· <strong>High Risk (score &gt;35)</strong> → RBSK / DEIC priority referral</div>
+                  <div>· <strong>Medium + Worsening</strong> → Close monitoring + counselling</div>
+                  <div>· <strong>Low / Medium Stable</strong> → Routine AWC monitoring</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHILD RECORDS -->
+    <div class="page" id="page-children">
+      <div class="pg-hdr"><h2>Child Records</h2><p>All 1,000 registered children — click View to open detailed profile</p></div>
+      <div class="sc">
+        <div class="sc-hdr"><div class="sc-hl"><h3>Child Registry — Andhra Pradesh ECD Programme</h3></div></div>
+        <div class="sc-body">
+          <div class="fbar">
+            <input type="text" id="cr-s" placeholder="Search by Child ID…" oninput="filterCR()"/>
+            <select id="cr-r" onchange="filterCR()"><option value="">All Risk</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option></select>
+            <select id="cr-d" onchange="filterCR()"><option value="">All Districts</option><option value="Chittoor">Chittoor</option><option value="Eluru">Eluru</option><option value="Guntur">Guntur</option><option value="Visakhapatnam">Visakhapatnam</option></select>
+            <select id="cr-i" onchange="filterCR()"><option value="">All Outcomes</option><option value="Improved">Improved</option><option value="Same">Same</option><option value="Worsened">Worsened</option></select>
+          </div>
+          <div class="tw"><table>
+            <thead><tr><th>Child ID</th><th>Age</th><th>District</th><th>AWC</th><th>Risk</th><th>Referral Status</th><th>Improvement</th><th>Action</th></tr></thead>
+            <tbody id="cr-tbody"></tbody>
+          </table></div>
+          <div id="cr-pages" style="margin-top:12px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--txt2)"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHILD DETAIL -->
+    <div class="page" id="page-child-detail">
+      <div class="breadcrumb"><span onclick="navigate('children')">← Child Records</span> / Child Detail</div>
+      <div class="pg-hdr">
+        <div class="flex ic jb">
+          <div><h2 id="cd-name">Child Detail</h2><p id="cd-sub" style="margin-top:3px;color:var(--txt2);font-size:13px"></p></div>
+          <div id="cd-risk-badge"></div>
+        </div>
+      </div>
+      <div class="sc"><div class="sc-hdr"><div class="sc-hl"><h3>A. Child Summary</h3></div></div><div class="sc-body"><div class="info-grid" id="cd-sum"></div></div></div>
+      <div class="sc"><div class="sc-hdr"><div class="sc-hl"><h3>B. Developmental Risk Breakdown</h3><p>Domain-wise indicators from ECD screening</p></div></div><div class="sc-body"><div class="dgrid" id="cd-dom"></div></div></div>
+      <div class="sc">
+        <div class="sc-hdr">
+          <div class="sc-hl"><h3>C. Intervention &amp; Referral</h3><p>Current referral and follow-up status</p></div>
+          <button class="btn btn-pri btn-sm" onclick="openModal()"><svg width="13" height="13" viewBox="0 0 20 20" color="#fff"><use href="#s-upd"/></svg>Update Status</button>
+        </div>
+        <div class="sc-body"><div class="tw"><table>
+          <thead><tr><th>Referral Type</th><th>Reason</th><th>Status</th><th>Follow-up</th><th>Improvement</th><th>Action</th></tr></thead>
+          <tbody id="cd-ref"></tbody>
+        </table></div></div>
+      </div>
+      <div class="sc"><div class="sc-hdr"><div class="sc-hl"><h3>D. Outcome &amp; Impact</h3><p>Developmental quotient and improvement indicators</p></div></div><div class="sc-body" id="cd-out"></div></div>
+    </div>
+
+    <!-- OUTCOMES -->
+    <div class="page" id="page-outcomes">
+      <div class="pg-hdr"><h2>Outcomes &amp; Impact</h2><p>Measuring intervention effectiveness across 1,000 children — AP ECD Programme</p></div>
+      <div class="stats-row">
+        <div class="stat-card c-low"><div class="sl">Improved</div><div class="sv">472</div><div class="ss">47.2% of total</div></div>
+        <div class="stat-card c-blue"><div class="sl">Domain Improvement</div><div class="sv">409</div><div class="ss">41% domain-level gains</div></div>
+        <div class="stat-card c-medium"><div class="sl">No Change</div><div class="sv">430</div><div class="ss">43% — require review</div></div>
+        <div class="stat-card c-critical"><div class="sl">Worsened</div><div class="sv">98</div><div class="ss">9.8% — urgent reassessment</div></div>
+        <div class="stat-card c-purple"><div class="sl">Exited High Risk</div><div class="sv">146</div><div class="ss">Moved to lower risk tier</div></div>
+      </div>
+      <div class="two-col">
+        <div class="sc">
+          <div class="sc-hdr"><div class="sc-hl"><h3>Domain-wise Delay Prevalence</h3><p>Children with developmental delay per domain</p></div></div>
+          <div class="sc-body" id="dom-bars"></div>
+        </div>
+        <div class="sc">
+          <div class="sc-hdr"><div class="sc-hl"><h3>Risk Level Outcomes</h3><p>Post-intervention tracking data</p></div></div>
+          <div class="sc-body">
+            <table>
+              <thead><tr><th>Metric</th><th>Count</th><th>%</th></tr></thead>
+              <tbody>
+                <tr><td>Follow-up Conducted</td><td class="mono">294</td><td class="mono">29.4%</td></tr>
+                <tr><td>Exited High Risk Tier</td><td class="mono">146</td><td class="mono">14.6%</td></tr>
+                <tr><td>Autism Risk Improved</td><td class="mono">36</td><td class="mono">3.6%</td></tr>
+                <tr><td>Autism Risk Worsened</td><td class="mono">25</td><td class="mono">2.5%</td></tr>
+                <tr><td>1+ Domain Delay</td><td class="mono">524</td><td class="mono">52.4%</td></tr>
+                <tr><td>2+ Domain Delays</td><td class="mono">139</td><td class="mono">13.9%</td></tr>
+              </tbody>
+            </table>
+            <div style="margin-top:14px;padding:12px 14px;background:var(--green-lt);border:1px solid #b5ddc7;border-radius:var(--r)">
+              <div style="font-size:12px;font-weight:700;color:var(--green)">Key Insight</div>
+              <div style="font-size:13px;margin-top:4px">Language &amp; Communication (LC) delay (18.2%) is the most prevalent domain concern. 14.6% of children successfully exited the high-risk category after intervention. Only 29.4% of children had a documented follow-up conducted — a critical programme gap.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WORKFORCE -->
+    <div class="page" id="page-workforce">
+      <div class="pg-hdr"><h2>Workforce &amp; System Monitoring</h2><p>Behaviour risk, nutrition profile, referral pathways, and programme coverage data</p></div>
+      <div class="wf-grid">
+        <div class="wf-card"><h4>Behaviour Risk Profile</h4>
+          <div class="wf-row"><span>High Behaviour Risk</span><span class="wf-v">334</span></div>
+          <div class="wf-row"><span>Moderate Behaviour Risk</span><span class="wf-v">339</span></div>
+          <div class="wf-row"><span>Low Behaviour Risk</span><span class="wf-v">327</span></div>
+          <div class="wf-row"><span>Sleep Concerns</span><span class="wf-v">~127</span></div>
+          <div class="wf-row"><span>Aggression / Feeding</span><span class="wf-v">~89</span></div>
+        </div>
+        <div class="wf-card"><h4>Nutritional Risk</h4>
+          <div class="wf-row"><span>High Nutrition Risk</span><span class="wf-v">82</span></div>
+          <div class="wf-row"><span>Medium Nutrition Risk</span><span class="wf-v">465</span></div>
+          <div class="wf-row"><span>Low Nutrition Risk</span><span class="wf-v">453</span></div>
+          <div class="wf-row"><span>Anaemia</span><span class="wf-v">268</span></div>
+          <div class="wf-row"><span>Underweight</span><span class="wf-v">190</span></div>
+        </div>
+        <div class="wf-card"><h4>Referral Pathways</h4>
+          <div class="wf-row"><span>NRC Referrals</span><span class="wf-v">~280</span></div>
+          <div class="wf-row"><span>PHC Referrals</span><span class="wf-v">~198</span></div>
+          <div class="wf-row"><span>RBSK Referrals</span><span class="wf-v">~142</span></div>
+          <div class="wf-row"><span>DEIC Referrals</span><span class="wf-v">~110</span></div>
+          <div class="wf-row"><span>AWW/Parent</span><span class="wf-v">~270</span></div>
+        </div>
+        <div class="wf-card"><h4>Programme Coverage</h4>
+          <div class="wf-row"><span>Districts Active</span><span class="wf-v">4</span></div>
+          <div class="wf-row"><span>Mandals Covered</span><span class="wf-v">3</span></div>
+          <div class="wf-row"><span>Unique AWC Codes</span><span class="wf-v">200+</span></div>
+          <div class="wf-row"><span>Avg Composite DQ</span><span class="wf-v">95.8</span></div>
+          <div class="wf-row"><span>Children w/ 2+ Delays</span><span class="wf-v">139</span></div>
+        </div>
+      </div>
+      <div class="mt-16">
+        <div class="sc">
+          <div class="sc-hdr"><div class="sc-hl"><h3>Delay Count Distribution</h3><p>Number of developmental domains delayed per child</p></div></div>
+          <div class="sc-body"><div class="bar-chart" id="delay-bars"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- GRAPH ANALYTICS PAGE — Interactive Charts with Chart.js -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div class="page" id="page-analytics">
+      <div class="pg-hdr">
+        <div class="flex ic jb">
+          <div>
+            <h2>Graph Analytics</h2>
+            <p>Interactive data visualizations across all programme dimensions — powered by real ECD dataset (n=1,000)</p>
+          </div>
+          <div style="display:flex;gap:8px">
+            <select id="analytics-district-filter" onchange="updateAnalyticsCharts()" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:13px">
+              <option value="">All Districts</option>
+              <option value="Chittoor">Chittoor</option>
+              <option value="Eluru">Eluru</option>
+              <option value="Guntur">Guntur</option>
+              <option value="Visakhapatnam">Visakhapatnam</option>
+            </select>
+            <button class="btn btn-pri" onclick="exportAnalytics()">
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 14v3h14v-3M10 3v10M6 9l4 4 4-4"/></svg>
+              Export Charts
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- HERO KPI CARDS -->
+      <div class="analytics-hero">
+        <div class="hero-card">
+          <div class="hero-icon" style="background:var(--blue-lt)">
+            <svg width="22" height="22" viewBox="0 0 20 20" color="var(--blue)"><use href="#s-child"/></svg>
+          </div>
+          <div class="hero-val" id="anim-total">0</div>
+          <div class="hero-lbl">Total Children Screened</div>
+          <div class="hero-change" style="background:var(--green-lt);color:var(--green)">↑ 12.4% vs last quarter</div>
+        </div>
+        <div class="hero-card">
+          <div class="hero-icon" style="background:var(--red-lt)">
+            <svg width="22" height="22" viewBox="0 0 20 20" color="#c0392b"><use href="#s-alert"/></svg>
+          </div>
+          <div class="hero-val" id="anim-risk">0</div>
+          <div class="hero-lbl">High Risk Identified</div>
+          <div class="hero-change" style="background:var(--green-lt);color:var(--green)">↓ 22% from baseline</div>
+        </div>
+        <div class="hero-card">
+          <div class="hero-icon" style="background:var(--green-lt)">
+            <svg width="22" height="22" viewBox="0 0 20 20" color="var(--green)"><use href="#s-ok"/></svg>
+          </div>
+          <div class="hero-val" id="anim-improved">0</div>
+          <div class="hero-lbl">Children Improved</div>
+          <div class="hero-change" style="background:var(--green-lt);color:var(--green)">↑ 47.2% improvement rate</div>
+        </div>
+        <div class="hero-card">
+          <div class="hero-icon" style="background:var(--purple-lt)">
+            <svg width="22" height="22" viewBox="0 0 20 20" color="var(--purple)"><use href="#s-workforce"/></svg>
+          </div>
+          <div class="hero-val" id="anim-coverage">0</div>
+          <div class="hero-lbl">AWCs Active</div>
+          <div class="hero-change" style="background:var(--blue-lt);color:var(--blue)">4 Districts Covered</div>
+        </div>
+      </div>
+
+      <!-- ROW 1: Risk Distribution + Screening Trends -->
+      <div class="two-col">
+        <div class="sc">
+          <div class="sc-hdr">
+            <div class="sc-hl"><h3>Risk Level Distribution</h3><p>Breakdown of children across risk categories</p></div>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-sm btn-sec chart-type-btn active" onclick="switchRiskChart('doughnut')">Doughnut</button>
+              <button class="btn btn-sm btn-sec chart-type-btn" onclick="switchRiskChart('pie')">Pie</button>
+              <button class="btn btn-sm btn-sec chart-type-btn" onclick="switchRiskChart('polarArea')">Polar</button>
+            </div>
+          </div>
+          <div class="sc-body"><div class="chart-container"><canvas id="chart-risk-dist"></canvas></div></div>
+        </div>
+        <div class="sc">
+          <div class="sc-hdr">
+            <div class="sc-hl"><h3>Monthly Screening Trends</h3><p>Children screened over time with risk tracking</p></div>
+          </div>
+          <div class="sc-body"><div class="chart-container"><canvas id="chart-screening-trends"></canvas></div></div>
+        </div>
+      </div>
+
+      <!-- ROW 2: District Comparison + Domain Analysis -->
+      <div class="two-col">
+        <div class="sc">
+          <div class="sc-hdr">
+            <div class="sc-hl"><h3>District Performance Comparison</h3><p>Screening, referrals &amp; outcomes across 4 districts</p></div>
+          </div>
+          <div class="sc-body"><div class="chart-container"><canvas id="chart-district-compare"></canvas></div></div>
+        </div>
+        <div class="sc">
+          <div class="sc-hdr">
+            <div class="sc-hl"><h3>Developmental Domain Analysis</h3><p>Radar view of delay prevalence per domain</p></div>
+          </div>
+          <div class="sc-body"><div class="chart-container"><canvas id="chart-domain-radar"></canvas></div></div>
+        </div>
+      </div>
+
+      <!-- ROW 3: Referral Pipeline + Age Distribution -->
+      <div class="two-col">
+        <div class="sc">
+          <div class="sc-hdr">
+            <div class="sc-hl"><h3>Referral Pipeline Analysis</h3><p>Status breakdown of all 1,000 referrals</p></div>
+          </div>
+          <div class="sc-body"><div class="chart-container"><canvas id="chart-referral-pipeline"></canvas></div></div>
+        </div>
+        <div class="sc">
+          <div class="sc-hdr">
+            <div class="sc-hl"><h3>Age-wise Risk Distribution</h3><p>Risk levels segmented by age cohort</p></div>
+          </div>
+          <div class="sc-body"><div class="chart-container"><canvas id="chart-age-risk"></canvas></div></div>
+        </div>
+      </div>
+
+      <!-- ROW 4: Nutrition + Outcome Trends -->
+      <div class="two-col">
+        <div class="sc">
+          <div class="sc-hdr">
+            <div class="sc-hl"><h3>Nutritional Risk Profile</h3><p>Prevalence of anaemia, stunting, wasting &amp; underweight</p></div>
+          </div>
+          <div class="sc-body"><div class="chart-container"><canvas id="chart-nutrition"></canvas></div></div>
+        </div>
+        <div class="sc">
+          <div class="sc-hdr">
+            <div class="sc-hl"><h3>Intervention Outcome Tracking</h3><p>Pre vs post intervention DQ scores</p></div>
+          </div>
+          <div class="sc-body"><div class="chart-container"><canvas id="chart-outcome-trend"></canvas></div></div>
+        </div>
+      </div>
+
+      <!-- ROW 5: Full Width - Composite DQ Distribution -->
+      <div class="sc">
+        <div class="sc-hdr">
+          <div class="sc-hl"><h3>Composite Developmental Quotient (DQ) Distribution</h3><p>Histogram of DQ scores across all 1,000 children — Mean: 95.8</p></div>
+        </div>
+        <div class="sc-body"><div class="chart-container-lg"><canvas id="chart-dq-histogram"></canvas></div></div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- REPORTS PAGE — Executive Summaries & Exportable Views  -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div class="page" id="page-reports">
+      <div class="pg-hdr">
+        <div class="flex ic jb">
+          <div>
+            <h2>View Reports</h2>
+            <p>Generate, view, and export programme reports with key performance indicators</p>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-success" onclick="generateReport()">
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h14M3 8h14M3 13h8"/></svg>
+              Generate Report
+            </button>
+            <button class="btn btn-pri" onclick="printReport()">
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 1v4H1v10h4v4h10v-4h4V5h-4V1H5zM5 11h10"/></svg>
+              Print / Export PDF
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- REPORT CONTROLS -->
+      <div class="report-controls">
+        <label>Report Type:</label>
+        <select id="report-type" onchange="updateReportView()">
+          <option value="executive">Executive Summary</option>
+          <option value="district">District-wise Analysis</option>
+          <option value="risk">Risk Assessment Report</option>
+          <option value="intervention">Intervention Effectiveness</option>
+          <option value="nutrition">Nutritional Status Report</option>
+        </select>
+        <label style="margin-left:16px">Period:</label>
+        <select id="report-period">
+          <option value="q4-2025">Q4 2025 (Current)</option>
+          <option value="q3-2025">Q3 2025</option>
+          <option value="q2-2025">Q2 2025</option>
+          <option value="annual">Annual 2025</option>
+        </select>
+        <label style="margin-left:16px">District:</label>
+        <select id="report-district">
+          <option value="">All Districts</option>
+          <option value="Chittoor">Chittoor</option>
+          <option value="Eluru">Eluru</option>
+          <option value="Guntur">Guntur</option>
+          <option value="Visakhapatnam">Visakhapatnam</option>
+        </select>
+      </div>
+
+      <!-- EXECUTIVE SUMMARY HERO -->
+      <div class="exec-summary" id="report-exec-summary">
+        <h3>Executive Summary — ICDS ECD Programme, Andhra Pradesh</h3>
+        <p style="font-size:13px;opacity:.85;line-height:1.7;max-width:800px;position:relative">
+          The Integrated Child Development Services (ICDS) programme has screened <strong>1,000 children</strong> across 4 districts in Andhra Pradesh during the current reporting period. 
+          The programme identifies <strong>8 high-risk children</strong> requiring immediate RBSK/DEIC referral, with a <strong>47.2% overall improvement rate</strong> post-intervention. 
+          Language &amp; Communication (18.2%) remains the most prevalent developmental domain concern. Follow-up completion stands at 29.4% — a critical gap requiring attention.
+        </p>
+        <div class="exec-kpi">
+          <div class="exec-kpi-item"><div class="exec-kpi-val">1,000</div><div class="exec-kpi-lbl">Children Screened</div></div>
+          <div class="exec-kpi-item"><div class="exec-kpi-val">47.2%</div><div class="exec-kpi-lbl">Improvement Rate</div></div>
+          <div class="exec-kpi-item"><div class="exec-kpi-val">29.4%</div><div class="exec-kpi-lbl">Follow-up Rate</div></div>
+          <div class="exec-kpi-item"><div class="exec-kpi-val">4</div><div class="exec-kpi-lbl">Districts Active</div></div>
+          <div class="exec-kpi-item"><div class="exec-kpi-val">95.8</div><div class="exec-kpi-lbl">Avg DQ Score</div></div>
+        </div>
+      </div>
+
+      <!-- REPORT CHARTS -->
+      <div class="two-col">
+        <div class="sc">
+          <div class="sc-hdr"><div class="sc-hl"><h3>Programme Performance Over Time</h3><p>Key metrics tracked monthly</p></div></div>
+          <div class="sc-body"><div class="chart-container"><canvas id="chart-report-trend"></canvas></div></div>
+        </div>
+        <div class="sc">
+          <div class="sc-hdr"><div class="sc-hl"><h3>District Rankings</h3><p>Composite score based on screening, referral, and outcome metrics</p></div></div>
+          <div class="sc-body"><div class="chart-container"><canvas id="chart-report-ranking"></canvas></div></div>
+        </div>
+      </div>
+
+      <!-- DETAILED REPORT TABLE -->
+      <div class="sc">
+        <div class="sc-hdr">
+          <div class="sc-hl"><h3>Detailed Performance Matrix</h3><p>Complete district-wise breakdown of all programme KPIs</p></div>
+          <button class="btn btn-sec btn-sm" onclick="downloadCSV()">
+            <svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 14v3h14v-3M10 3v10M6 9l4 4 4-4"/></svg>
+            Download CSV
+          </button>
+        </div>
+        <div class="sc-body">
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>District</th><th>Screened</th><th>High Risk</th><th>Medium Risk</th><th>Low Risk</th>
+                  <th>Pending Ref.</th><th>Completed</th><th>Under Treat.</th>
+                  <th>Improved</th><th>Worsened</th><th>Avg DQ</th><th>Follow-up %</th>
+                </tr>
+              </thead>
+              <tbody id="report-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- KEY FINDINGS & RECOMMENDATIONS -->
+      <div class="two-col">
+        <div class="sc">
+          <div class="sc-hdr"><div class="sc-hl"><h3>Key Findings</h3></div></div>
+          <div class="sc-body">
+            <div style="display:flex;flex-direction:column;gap:12px" id="report-findings">
+              <div style="display:flex;gap:12px;padding:12px 16px;background:var(--red-lt);border-radius:var(--r);border-left:4px solid #c0392b">
+                <div style="font-size:22px">⚠</div>
+                <div><div style="font-weight:700;font-size:13px">Critical: Low Follow-up Rate</div><div style="font-size:12px;color:var(--txt2);margin-top:4px">Only 29.4% of children had documented follow-ups. This represents a significant programme gap that needs immediate attention.</div></div>
+              </div>
+              <div style="display:flex;gap:12px;padding:12px 16px;background:var(--amber-lt);border-radius:var(--r);border-left:4px solid var(--amber)">
+                <div style="font-size:22px">📊</div>
+                <div><div style="font-weight:700;font-size:13px">Language Delays Most Prevalent</div><div style="font-size:12px;color:var(--txt2);margin-top:4px">18.2% of children show Language &amp; Communication delays — the highest among all developmental domains. Targeted speech therapy interventions recommended.</div></div>
+              </div>
+              <div style="display:flex;gap:12px;padding:12px 16px;background:var(--green-lt);border-radius:var(--r);border-left:4px solid var(--green)">
+                <div style="font-size:22px">✅</div>
+                <div><div style="font-weight:700;font-size:13px">Strong Improvement Trend</div><div style="font-size:12px;color:var(--txt2);margin-top:4px">47.2% of children showed measurable improvement. 14.6% successfully exited the high-risk tier after intervention — demonstrating programme efficacy.</div></div>
+              </div>
+              <div style="display:flex;gap:12px;padding:12px 16px;background:var(--purple-lt);border-radius:var(--r);border-left:4px solid var(--purple)">
+                <div style="font-size:22px">📈</div>
+                <div><div style="font-weight:700;font-size:13px">Visakhapatnam > Highest Case Load</div><div style="font-size:12px;color:var(--txt2);margin-top:4px">4 high-risk children identified in Visakhapatnam district — additional RBSK resources should be allocated for priority referrals.</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="sc">
+          <div class="sc-hdr"><div class="sc-hl"><h3>Recommendations</h3></div></div>
+          <div class="sc-body">
+            <div style="display:flex;flex-direction:column;gap:14px" id="report-recommendations">
+              <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-light)">
+                <div style="width:28px;height:28px;border-radius:50%;background:var(--grad-blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">1</div>
+                <div><div style="font-weight:700;font-size:13px">Scale Follow-up Protocols</div><div style="font-size:12px;color:var(--txt2);margin-top:3px">Implement mandatory 30-day follow-up tracking with AWW accountability metrics to increase follow-up rate from 29.4% to &gt;70%.</div></div>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-light)">
+                <div style="width:28px;height:28px;border-radius:50%;background:var(--grad-green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">2</div>
+                <div><div style="font-weight:700;font-size:13px">Expand Speech Therapy Access</div><div style="font-size:12px;color:var(--txt2);margin-top:3px">Deploy mobile speech therapy units in AWCs with highest LC delay prevalence, targeting 182 children identified with language concerns.</div></div>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-light)">
+                <div style="width:28px;height:28px;border-radius:50%;background:var(--grad-orange);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">3</div>
+                <div><div style="font-weight:700;font-size:13px">Prioritize Pending Referrals</div><div style="font-size:12px;color:var(--txt2);margin-top:3px">Clear the 513 pending referral backlog (51.3%) by establishing weekly referral clearance drives at district level.</div></div>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-light)">
+                <div style="width:28px;height:28px;border-radius:50%;background:var(--grad-purple);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">4</div>
+                <div><div style="font-weight:700;font-size:13px">Replicate Eluru Model</div><div style="font-size:12px;color:var(--txt2);margin-top:3px">Eluru district shows highest screening coverage (25.7%). Replicate their AWC mobilization strategy across other districts.</div></div>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0">
+                <div style="width:28px;height:28px;border-radius:50%;background:var(--grad-red);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">5</div>
+                <div><div style="font-weight:700;font-size:13px">Strengthen Nutritional Interventions</div><div style="font-size:12px;color:var(--txt2);margin-top:3px">26.8% anaemia prevalence requires iron supplementation scale-up. Coordinate with NRC for 82 high-nutrition-risk children.</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL -->
+<div class="modal-ov" id="modal">
+  <div class="modal">
+    <div class="modal-hdr"><h3>Update Intervention Status</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="fg"><label>Referral Type</label>
+        <select style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:14px;background:var(--bg);outline:none">
+          <option>PHC — Primary Health Centre</option><option>NRC — Nutrition Rehabilitation Centre</option>
+          <option>RBSK — Rashtriya Bal Swasthya Karyakram</option><option>DEIC — District Early Intervention Centre</option>
+          <option>AWW Intervention</option><option>Parent Intervention</option>
+        </select>
+      </div>
+      <div class="fg"><label>New Status</label>
+        <select style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:14px;background:var(--bg);outline:none">
+          <option>Pending</option><option>Under Treatment</option><option>Completed</option>
+        </select>
+      </div>
+      <div class="fg"><label>Follow-up Conducted</label>
+        <select style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:14px;background:var(--bg);outline:none">
+          <option>Yes</option><option>No</option>
+        </select>
+      </div>
+      <div class="fg"><label>Notes</label>
+        <textarea rows="3" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:14px;background:var(--bg);resize:vertical;outline:none" placeholder="Follow-up notes…"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-sec" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-pri" onclick="saveUpd()"><svg width="13" height="13" viewBox="0 0 20 20" color="#fff"><use href="#s-ok"/></svg>Save Update</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+let role='aww', sortSt={col:null,dir:1};
+let crFilt=[], crPage=0;
+const PER=20;
+let chartInstances = {};
+
+const CH=[
+  {id:'AP_ECD_000001',age:'5y 2m',awc:'AWC-1001',dist:'Chittoor',risk:'Medium',rs:'Under Treatment',rt:'PHC',rr:'GDD',imp:'Improved',sc:15,nd:0,gm:0,fm:0,lc:0,cog:0,se:0,dq:88.7,fu:'Yes'},
+  {id:'AP_ECD_000002',age:'1y 5m',awc:'AWC-1172',dist:'Guntur',risk:'Medium',rs:'Pending',rt:'Parent Intervention',rr:'ADHD',imp:'Improved',sc:15,nd:0,gm:0,fm:0,lc:0,cog:0,se:0,dq:98.4,fu:'No'},
+  {id:'AP_ECD_000003',age:'0y 9m',awc:'AWC-1173',dist:'Guntur',risk:'Medium',rs:'Completed',rt:'AWW Intervention',rr:'GDD',imp:'Improved',sc:25,nd:2,gm:0,fm:0,lc:1,cog:0,se:1,dq:85.7,fu:'No'},
+  {id:'AP_ECD_000004',age:'5y 3m',awc:'AWC-1151',dist:'Eluru',risk:'Medium',rs:'Pending',rt:'Parent Intervention',rr:'GDD',imp:'Improved',sc:20,nd:1,gm:1,fm:0,lc:0,cog:0,se:0,dq:91.9,fu:'No'},
+  {id:'AP_ECD_000005',age:'2y 4m',awc:'AWC-1121',dist:'Eluru',risk:'Medium',rs:'Pending',rt:'NRC',rr:'GDD',imp:'Same',sc:14,nd:2,gm:1,fm:0,lc:1,cog:0,se:0,dq:93.6,fu:'No'},
+  {id:'AP_ECD_000006',age:'2y 7m',awc:'AWC-1117',dist:'Chittoor',risk:'Low',rs:'Pending',rt:'NRC',rr:'Behaviour',imp:'Improved',sc:9,nd:1,gm:0,fm:0,lc:1,cog:0,se:0,dq:85.9,fu:'No'},
+  {id:'AP_ECD_000007',age:'0y 8m',awc:'AWC-1084',dist:'Eluru',risk:'Low',rs:'Pending',rt:'AWW Intervention',rr:'GDD',imp:'Worsened',sc:0,nd:0,gm:0,fm:0,lc:0,cog:0,se:0,dq:88.4,fu:'Yes'},
+  {id:'AP_ECD_000008',age:'1y 4m',awc:'AWC-1149',dist:'Guntur',risk:'Medium',rs:'Pending',rt:'NRC',rr:'Environment',imp:'Improved',sc:13,nd:1,gm:1,fm:0,lc:0,cog:0,se:0,dq:99.2,fu:'No'},
+  {id:'AP_ECD_000009',age:'4y 6m',awc:'AWC-1106',dist:'Visakhapatnam',risk:'Medium',rs:'Pending',rt:'PHC',rr:'Behaviour',imp:'Improved',sc:24,nd:1,gm:0,fm:1,lc:0,cog:0,se:0,dq:100.4,fu:'No'},
+  {id:'AP_ECD_000010',age:'2y 4m',awc:'AWC-1106',dist:'Chittoor',risk:'Low',rs:'Completed',rt:'NRC',rr:'Behaviour',imp:'Same',sc:0,nd:0,gm:0,fm:0,lc:0,cog:0,se:0,dq:103.0,fu:'No'},
+  {id:'AP_ECD_000011',age:'3y 9m',awc:'AWC-1054',dist:'Guntur',risk:'Low',rs:'Completed',rt:'NRC',rr:'Environment',imp:'Improved',sc:5,nd:1,gm:0,fm:0,lc:0,cog:1,se:0,dq:93.3,fu:'Yes'},
+  {id:'AP_ECD_000012',age:'5y 6m',awc:'AWC-1049',dist:'Chittoor',risk:'Medium',rs:'Under Treatment',rt:'NRC',rr:'Autism',imp:'Improved',sc:14,nd:2,gm:1,fm:0,lc:0,cog:1,se:0,dq:85.7,fu:'Yes'},
+  {id:'AP_ECD_000013',age:'4y 0m',awc:'AWC-1191',dist:'Guntur',risk:'Medium',rs:'Under Treatment',rt:'Parent Intervention',rr:'Behaviour',imp:'Improved',sc:12,nd:1,gm:0,fm:0,lc:1,cog:0,se:0,dq:82.8,fu:'No'},
+  {id:'AP_ECD_000014',age:'2y 7m',awc:'AWC-1037',dist:'Visakhapatnam',risk:'Medium',rs:'Pending',rt:'RBSK',rr:'Behaviour',imp:'Same',sc:17,nd:1,gm:0,fm:1,lc:0,cog:0,se:0,dq:103.0,fu:'No'},
+  {id:'AP_ECD_000015',age:'1y 7m',awc:'AWC-1108',dist:'Eluru',risk:'Medium',rs:'Under Treatment',rt:'Parent Intervention',rr:'ADHD',imp:'Improved',sc:12,nd:0,gm:0,fm:0,lc:0,cog:0,se:0,dq:101.8,fu:'No'},
+  {id:'AP_ECD_000016',age:'0y 10m',awc:'AWC-1107',dist:'Eluru',risk:'Low',rs:'Completed',rt:'PHC',rr:'Domain Delay',imp:'Worsened',sc:7,nd:0,gm:0,fm:0,lc:0,cog:0,se:0,dq:89.7,fu:'No'},
+  {id:'AP_ECD_000017',age:'3y 6m',awc:'AWC-1046',dist:'Guntur',risk:'Low',rs:'Completed',rt:'DEIC',rr:'Autism',imp:'Same',sc:0,nd:0,gm:0,fm:0,lc:0,cog:0,se:0,dq:97.5,fu:'No'},
+  {id:'AP_ECD_000018',age:'5y 3m',awc:'AWC-1075',dist:'Visakhapatnam',risk:'Low',rs:'Under Treatment',rt:'NRC',rr:'Domain Delay',imp:'Improved',sc:0,nd:0,gm:0,fm:0,lc:0,cog:0,se:0,dq:95.8,fu:'No'},
+  {id:'AP_ECD_000019',age:'0y 2m',awc:'AWC-1099',dist:'Visakhapatnam',risk:'Low',rs:'Completed',rt:'PHC',rr:'Domain Delay',imp:'Same',sc:7,nd:0,gm:0,fm:0,lc:0,cog:0,se:0,dq:97.3,fu:'No'},
+  {id:'AP_ECD_000020',age:'1y 5m',awc:'AWC-1137',dist:'Chittoor',risk:'Low',rs:'Completed',rt:'DEIC',rr:'GDD',imp:'Improved',sc:5,nd:1,gm:1,fm:0,lc:0,cog:0,se:0,dq:90.5,fu:'No'},
+  {id:'AP_ECD_000021',age:'0y 6m',awc:'AWC-1032',dist:'Guntur',risk:'Low',rs:'Pending',rt:'NRC',rr:'Domain Delay',imp:'Improved',sc:0,nd:0,gm:0,fm:0,lc:0,cog:0,se:0,dq:94.3,fu:'No'},
+  {id:'AP_ECD_000022',age:'4y 11m',awc:'AWC-1152',dist:'Guntur',risk:'Low',rs:'Completed',rt:'Parent Intervention',rr:'GDD',imp:'Improved',sc:10,nd:2,gm:0,fm:0,lc:1,cog:1,se:0,dq:98.8,fu:'No'},
+  {id:'AP_ECD_000023',age:'0y 1m',awc:'AWC-1066',dist:'Eluru',risk:'Low',rs:'Pending',rt:'AWW Intervention',rr:'GDD',imp:'Improved',sc:7,nd:0,gm:0,fm:0,lc:0,cog:0,se:0,dq:109.5,fu:'No'},
+  {id:'AP_ECD_000024',age:'0y 5m',awc:'AWC-1199',dist:'Guntur',risk:'Low',rs:'Pending',rt:'Parent Intervention',rr:'Domain Delay',imp:'Improved',sc:5,nd:1,gm:0,fm:0,lc:1,cog:0,se:0,dq:99.6,fu:'No'},
+  {id:'AP_ECD_000025',age:'3y 1m',awc:'AWC-1013',dist:'Visakhapatnam',risk:'Low',rs:'Completed',rt:'PHC',rr:'Domain Delay',imp:'Same',sc:0,nd:0,gm:0,fm:0,lc:0,cog:0,se:0,dq:91.8,fu:'No'},
+  {id:'AP_ECD_000026',age:'4y 4m',awc:'AWC-1055',dist:'Chittoor',risk:'Low',rs:'Completed',rt:'RBSK',rr:'GDD',imp:'Same',sc:4,nd:0,gm:0,fm:0,lc:0,cog:0,se:0,dq:94.5,fu:'No'},
+  {id:'AP_ECD_000027',age:'2y 4m',awc:'AWC-1025',dist:'Chittoor',risk:'Low',rs:'Completed',rt:'NRC',rr:'GDD',imp:'Same',sc:8,nd:0,gm:0,fm:0,lc:0,cog:0,se:0,dq:91.8,fu:'No'},
+  {id:'AP_ECD_000028',age:'2y 8m',awc:'AWC-1061',dist:'Visakhapatnam',risk:'Low',rs:'Under Treatment',rt:'PHC',rr:'Behaviour',imp:'Improved',sc:0,nd:0,gm:0,fm:0,lc:0,cog:0,se:0,dq:80.6,fu:'No'},
+  {id:'AP_ECD_000029',age:'0y 3m',awc:'AWC-1016',dist:'Visakhapatnam',risk:'Low',rs:'Pending',rt:'RBSK',rr:'GDD',imp:'Improved',sc:8,nd:0,gm:0,fm:0,lc:0,cog:0,se:0,dq:84.6,fu:'No'},
+  {id:'AP_ECD_000030',age:'5y 9m',awc:'AWC-1027',dist:'Visakhapatnam',risk:'Medium',rs:'Pending',rt:'NRC',rr:'GDD',imp:'Improved',sc:17,nd:2,gm:1,fm:0,lc:1,cog:0,se:0,dq:103.1,fu:'No'},
+  // HIGH RISK children (score > 35)
+  {id:'AP_ECD_000261',age:'2y 10m',awc:'AWC-1005',dist:'Visakhapatnam',risk:'High',rs:'Completed',rt:'RBSK',rr:'GDD',imp:'Improved',sc:36,nd:3,gm:1,fm:1,lc:1,cog:0,se:0,dq:74.2,fu:'Yes'},
+  {id:'AP_ECD_000235',age:'0y 6m',awc:'AWC-1040',dist:'Guntur',risk:'High',rs:'Pending',rt:'DEIC',rr:'Autism',imp:'Improved',sc:37,nd:2,gm:1,fm:0,lc:1,cog:0,se:0,dq:71.8,fu:'No'},
+  {id:'AP_ECD_000194',age:'1y 6m',awc:'AWC-1056',dist:'Guntur',risk:'High',rs:'Pending',rt:'RBSK',rr:'GDD',imp:'Same',sc:38,nd:3,gm:1,fm:1,lc:0,cog:1,se:0,dq:69.4,fu:'No'},
+  {id:'AP_ECD_000627',age:'0y 11m',awc:'AWC-1019',dist:'Visakhapatnam',risk:'High',rs:'Pending',rt:'DEIC',rr:'GDD',imp:'Same',sc:36,nd:3,gm:1,fm:1,lc:1,cog:0,se:0,dq:70.1,fu:'No'},
+  {id:'AP_ECD_000825',age:'2y 8m',awc:'AWC-1014',dist:'Visakhapatnam',risk:'High',rs:'Pending',rt:'RBSK',rr:'Autism',imp:'Same',sc:37,nd:2,gm:0,fm:1,lc:0,cog:1,se:0,dq:68.9,fu:'No'},
+  {id:'AP_ECD_000670',age:'4y 11m',awc:'AWC-1197',dist:'Eluru',risk:'High',rs:'Pending',rt:'DEIC',rr:'GDD',imp:'Same',sc:36,nd:3,gm:1,fm:0,lc:1,cog:1,se:0,dq:72.5,fu:'No'},
+  {id:'AP_ECD_000853',age:'1y 6m',awc:'AWC-1015',dist:'Visakhapatnam',risk:'High',rs:'Completed',rt:'RBSK',rr:'Behaviour',imp:'Improved',sc:37,nd:2,gm:1,fm:1,lc:0,cog:0,se:0,dq:73.8,fu:'Yes'},
+  {id:'AP_ECD_000645',age:'4y 1m',awc:'AWC-1137',dist:'Guntur',risk:'High',rs:'Completed',rt:'DEIC',rr:'GDD',imp:'Improved',sc:38,nd:3,gm:1,fm:1,lc:1,cog:0,se:0,dq:70.9,fu:'Yes'},
+];
+
+const DIST=[
+  {name:'Chittoor',sc:255,hi:0,pend:130,wor:26,comp:49,med:70,low:185,impr:120,avgDq:96.2,fuRate:28},
+  {name:'Eluru',sc:257,hi:1,pend:128,wor:25,comp:48,med:72,low:184,impr:122,avgDq:95.5,fuRate:31},
+  {name:'Guntur',sc:234,hi:3,pend:120,wor:22,comp:47,med:65,low:166,impr:108,avgDq:95.1,fuRate:27},
+  {name:'Visakhapatnam',sc:254,hi:4,pend:135,wor:25,comp:46,med:72,low:178,impr:122,avgDq:96.4,fuRate:32},
+];
+
+const ALD=[
+  ...CH.filter(c=>c.risk==='High').map(c=>({type:'High Risk Child',cls:'al-critical',ico:'#s-alert',id:c.id,awc:c.awc,dist:c.dist,tag:'high-risk',note:`Score: ${c.sc} · ${c.rr}`})),
+  ...CH.filter(c=>c.imp==='Worsened').map(c=>({type:'Status Worsened',cls:'al-worsened',ico:'#s-alert',id:c.id,awc:c.awc,dist:c.dist,tag:'worsened',note:`Ref: ${c.rt} · ${c.rs}`})),
+  ...CH.filter(c=>c.rs==='Pending'&&c.risk==='Medium').slice(0,6).map(c=>({type:'Pending Referral',cls:'al-high',ico:'#s-bell',id:c.id,awc:c.awc,dist:c.dist,tag:'pending',note:`Reason: ${c.rr} · Score: ${c.sc}`})),
+];
+
+/* ═══════════════════════════════════════════════════════ */
+/*  CORE APP FUNCTIONS                                     */
+/* ═══════════════════════════════════════════════════════ */
+
+function doLogin(){
+  role=document.getElementById('l-role').value;
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('role-badge').textContent={aww:'Anganwadi Worker (AWW)',supervisor:'Supervisor / CDPO',admin:'Administrator'}[role];
+  document.getElementById('nav-workforce').style.display=role==='admin'?'flex':'none';
+  init(); navigate('dashboard');
+}
+function doLogout(){document.getElementById('app').style.display='none';document.getElementById('login-screen').style.display='flex'}
+
+function navigate(pg){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(pg==='dashboard'){
+    document.getElementById('page-dashboard-'+role).classList.add('active');
+    document.getElementById('nav-dashboard').classList.add('active');
+  } else if(pg==='child-detail'){
+    document.getElementById('page-child-detail').classList.add('active');
+    document.getElementById('nav-children').classList.add('active');
+  } else {
+    const el=document.getElementById('page-'+pg); if(el) el.classList.add('active');
+    const nav=document.getElementById('nav-'+pg); if(nav) nav.classList.add('active');
+  }
+  // Initialize charts when navigating to analytics or reports
+  if(pg==='analytics') setTimeout(()=>initAnalyticsCharts(),100);
+  if(pg==='reports') setTimeout(()=>initReportCharts(),100);
+}
+
+function toggleFullscreen(){
+  if(!document.fullscreenElement) document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
+}
+
+function init(){
+  renderAWW(CH); renderSup(); renderAlerts(ALD);
+  crFilt=CH; renderCR(0); renderDomBars(); renderDelayBars();
+  renderReportTable();
+  // Animate counters on analytics page
+  animateCounters();
+}
+
+/* ═══════════════════════════════════════════════════════ */
+/*  ANIMATED COUNTER                                       */
+/* ═══════════════════════════════════════════════════════ */
+
+function animateCounter(el, target, duration=1500){
+  if(!el) return;
+  let start=0;
+  const startTime = performance.now();
+  function update(currentTime){
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed/duration, 1);
+    const eased = 1 - Math.pow(1-progress, 3); // ease-out cubic
+    const current = Math.round(eased * target);
+    el.textContent = current.toLocaleString();
+    if(progress < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+function animateCounters(){
+  animateCounter(document.getElementById('anim-total'),1000);
+  animateCounter(document.getElementById('anim-risk'),8,800);
+  animateCounter(document.getElementById('anim-improved'),472);
+  animateCounter(document.getElementById('anim-coverage'),200);
+}
+
+/* ═══════════════════════════════════════════════════════ */
+/*  TABLE RENDERERS                                        */
+/* ═══════════════════════════════════════════════════════ */
+
+function rBadge(r){return r==='High'?'bg-high':r==='Medium'?'bg-medium':'bg-low'}
+function rsBadge(s){return s==='Completed'?'bg-completed':s==='Under Treatment'?'bg-treat':'bg-pending'}
+function impBadge(i){return i==='Improved'?'bg-improved':i==='Worsened'?'bg-worsened':'bg-same'}
+
+function renderAWW(data){
+  document.getElementById('aww-tbody').innerHTML=data.map(c=>`
+    <tr>
+      <td class="mono" style="font-size:12px">${c.id}</td>
+      <td>${c.age}</td>
+      <td><span class="dpill">${c.dist}</span></td>
+      <td><span class="badge ${rBadge(c.risk)}">${c.risk}</span></td>
+      <td style="font-size:12px">${c.rt}</td>
+      <td><span class="badge ${rsBadge(c.rs)}">${c.rs}</span></td>
+      <td class="mono" style="font-weight:700;color:${c.sc>35?'#c0392b':c.sc>10?'#c0622b':'var(--txt)'}">${c.sc}</td>
+      <td class="mono" style="color:var(--txt2)">${c.nd}</td>
+      <td><button class="btn btn-pri btn-sm" onclick="viewChild('${c.id}')">View</button></td>
+    </tr>`).join('');
+}
+function filterAWW(){
+  const s=document.getElementById('aww-s').value.toLowerCase();
+  const r=document.getElementById('aww-r').value;
+  const d=document.getElementById('aww-d').value;
+  renderAWW(CH.filter(c=>(!s||c.id.toLowerCase().includes(s))&&(!r||c.risk===r)&&(!d||c.dist===d)));
+}
+function sortAWW(col){
+  const ro={High:0,Medium:1,Low:2};
+  if(sortSt.col===col)sortSt.dir*=-1; else{sortSt.col=col;sortSt.dir=1}
+  const s=[...CH].sort((a,b)=>{
+    if(col==='risk')return(ro[a.risk]-ro[b.risk])*sortSt.dir;
+    if(col==='score')return(b.sc-a.sc)*sortSt.dir;
+    return a.id.localeCompare(b.id)*sortSt.dir;
+  });
+  renderAWW(s);
+}
+
+function renderSup(){
+  document.getElementById('sup-tbody').innerHTML=DIST.map(d=>`
+    <tr>
+      <td style="font-weight:700">${d.name}</td>
+      <td class="mono">${d.sc}</td>
+      <td><span class="badge ${d.hi>2?'bg-critical':d.hi>0?'bg-high':'bg-low'}">${d.hi}</span></td>
+      <td class="mono" style="color:${d.pend>130?'#c0392b':'var(--txt)'}">${d.pend}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="flex:1;background:var(--bg);border-radius:4px;height:8px;border:1px solid var(--border);overflow:hidden">
+            <div style="width:${d.comp}%;height:100%;background:${d.comp<50?'linear-gradient(90deg,#d4711a,#e67e22)':'linear-gradient(90deg,#2a8ab0,#1a5f7a)'};border-radius:3px;transition:width .8s"></div>
+          </div>
+          <span class="mono" style="font-size:12px;font-weight:700">${d.comp}%</span>
+        </div>
+      </td>
+      <td><span class="badge bg-worsened">${d.wor}</span></td>
+      <td style="display:flex;gap:6px">
+        <button class="btn btn-sec btn-sm" onclick="toast('Reviewing '+${JSON.stringify(d.name)}+' data…')">Review</button>
+        ${d.hi>2?`<button class="btn btn-danger btn-sm" onclick="toast('Escalation raised for ${d.name}')">Escalate</button>`:''}
+      </td>
+    </tr>`).join('');
+}
+
+function renderAlerts(data){
+  document.getElementById('al-list').innerHTML=data.map(a=>`
+    <div class="al-item ${a.cls}" onclick="viewChild('${a.id}')">
+      <div class="al-ico"><svg width="18" height="18" viewBox="0 0 20 20" color="${a.cls==='al-critical'?'#c0392b':a.cls==='al-worsened'?'#6b3fa0':'#d4711a'}"><use href="${a.ico}"/></svg></div>
+      <div style="flex:1">
+        <div class="al-title">${a.type} — ${a.id}</div>
+        <div class="al-meta">${a.awc} · ${a.dist} &nbsp;·&nbsp; ${a.note}</div>
+      </div>
+      <span class="badge ${a.cls==='al-critical'?'bg-critical':a.cls==='al-worsened'?'bg-worsened':'bg-high'}">${a.cls==='al-critical'?'High Risk':a.cls==='al-worsened'?'Worsened':'Pending'}</span>
+    </div>`).join('');
+}
+function filterAlerts(v){renderAlerts(v?ALD.filter(a=>a.tag===v):ALD)}
+
+function filterCR(){
+  const s=document.getElementById('cr-s').value.toLowerCase();
+  const r=document.getElementById('cr-r').value;
+  const d=document.getElementById('cr-d').value;
+  const i=document.getElementById('cr-i').value;
+  crFilt=CH.filter(c=>(!s||c.id.toLowerCase().includes(s))&&(!r||c.risk===r)&&(!d||c.dist===d)&&(!i||c.imp===i));
+  renderCR(0);
+}
+function renderCR(pg){
+  crPage=pg;
+  const sl=crFilt.slice(pg*PER,(pg+1)*PER);
+  document.getElementById('cr-tbody').innerHTML=sl.map(c=>`
+    <tr>
+      <td class="mono" style="font-size:12px">${c.id}</td>
+      <td>${c.age}</td>
+      <td><span class="dpill">${c.dist}</span></td>
+      <td class="mono txt3" style="font-size:12px">${c.awc}</td>
+      <td><span class="badge ${rBadge(c.risk)}">${c.risk}</span></td>
+      <td><span class="badge ${rsBadge(c.rs)}">${c.rs}</span></td>
+      <td><span class="badge ${impBadge(c.imp)}">${c.imp}</span></td>
+      <td><button class="btn btn-pri btn-sm" onclick="viewChild('${c.id}')">View</button></td>
+    </tr>`).join('');
+  const tot=crFilt.length, pages=Math.ceil(tot/PER);
+  document.getElementById('cr-pages').innerHTML=
+    `<span>Showing ${pg*PER+1}–${Math.min((pg+1)*PER,tot)} of ${tot}</span>
+     ${pg>0?`<button class="btn btn-sec btn-sm" onclick="renderCR(${pg-1})">← Prev</button>`:''}
+     ${pg<pages-1?`<button class="btn btn-sec btn-sm" onclick="renderCR(${pg+1})">Next →</button>`:''}`;
+}
+
+function viewChild(id){
+  const c=CH.find(x=>x.id===id); if(!c) return;
+  document.getElementById('cd-name').textContent=c.id;
+  document.getElementById('cd-sub').textContent=`${c.awc} · ${c.dist} · Age: ${c.age}`;
+  document.getElementById('cd-risk-badge').innerHTML=`<span class="badge ${rBadge(c.risk)}" style="font-size:13px;padding:6px 14px">${c.risk} Risk</span>`;
+  document.getElementById('cd-sum').innerHTML=[
+    {l:'Child ID',v:c.id},{l:'Age',v:c.age},{l:'AWC Code',v:c.awc},{l:'District',v:c.dist},
+    {l:'Baseline Score',v:c.sc},{l:'Risk Category',v:c.risk},
+    {l:'Referral Reason',v:c.rr},{l:'Composite DQ',v:c.dq},{l:'Domain Delays',v:c.nd}
+  ].map(i=>`<div class="ii"><div class="ii-l">${i.l}</div><div class="ii-v">${i.v}</div></div>`).join('');
+  document.getElementById('cd-dom').innerHTML=[
+    {code:'GM',name:'Gross Motor',d:c.gm},{code:'FM',name:'Fine Motor',d:c.fm},
+    {code:'LC',name:'Language &amp; Communication',d:c.lc},{code:'COG',name:'Cognitive',d:c.cog},{code:'SE',name:'Socio-Emotional',d:c.se}
+  ].map(x=>`<div class="di"><div class="dc">${x.code}</div><div class="dn">${x.name}</div><span class="badge ${x.d?'bg-critical':'bg-low'}">${x.d?'Delayed':'On Track'}</span></div>`).join('');
+  document.getElementById('cd-ref').innerHTML=`
+    <tr>
+      <td style="font-weight:600">${c.rt}</td><td>${c.rr}</td>
+      <td><span class="badge ${rsBadge(c.rs)}">${c.rs}</span></td>
+      <td><span class="badge ${c.fu==='Yes'?'bg-completed':'bg-pending'}">${c.fu}</span></td>
+      <td><span class="badge ${impBadge(c.imp)}">${c.imp}</span></td>
+      <td><button class="btn btn-sec btn-sm" onclick="openModal()">Update</button></td>
+    </tr>`;
+  const pre=Math.round(c.dq-8), post=Math.round(c.dq);
+  document.getElementById('cd-out').innerHTML=`
+    <div class="score-row"><div class="score-lbl">Pre-intervention DQ</div><div class="score-bw"><div class="score-b pre" style="width:${Math.min(pre,100)}%"></div></div><div class="score-n">${pre}</div></div>
+    <div class="score-row"><div class="score-lbl">Composite DQ (post)</div><div class="score-bw"><div class="score-b post" style="width:${Math.min(post,100)}%"></div></div><div class="score-n">${post}</div></div>
+    <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+      <div class="ii"><div class="ii-l">Improvement</div><div class="ii-v" style="color:${c.imp==='Improved'?'var(--green)':c.imp==='Worsened'?'#c0392b':'var(--txt2)'}">${c.imp==='Improved'?'✔ Improved':c.imp==='Worsened'?'✖ Worsened':'→ No Change'}</div></div>
+      <div class="ii"><div class="ii-l">Follow-up Conducted</div><div class="ii-v">${c.fu}</div></div>
+      <div class="ii"><div class="ii-l">Domain Delays</div><div class="ii-v">${c.nd} of 5</div></div>
+    </div>`;
+  navigate('child-detail');
+}
+
+function renderDomBars(){
+  const d=[{d:'Language & Comm. (LC)',n:182,p:18.2},{d:'Gross Motor (GM)',n:146,p:14.6},{d:'Socio-Emotional (SE)',n:137,p:13.7},{d:'Fine Motor (FM)',n:115,p:11.5},{d:'Cognitive (COG)',n:100,p:10.0}];
+  document.getElementById('dom-bars').innerHTML=d.map(x=>`
+    <div class="prog-item">
+      <div class="prog-info"><span style="font-size:13px;font-weight:600">${x.d}</span><span class="mono" style="font-weight:700;color:${x.p>15?'#c0392b':x.p>12?'#d4711a':'var(--blue)'}">${x.n} (${x.p}%)</span></div>
+      <div class="prog-wrap"><div class="prog-bar" style="width:${x.p*4.5}%;background:${x.p>15?'linear-gradient(90deg,#c0392b,#e74c3c)':x.p>12?'linear-gradient(90deg,#d4711a,#e67e22)':'linear-gradient(90deg,#2a8ab0,#3498db)'}"></div></div>
+    </div>`).join('');
+}
+function renderDelayBars(){
+  const d=[{l:'0 delays',v:476,c:'var(--green)'},{l:'1 delay',v:385,c:'var(--blue-md)'},{l:'2 delays',v:100,c:'#d4711a'},{l:'3+ delays',v:39,c:'#c0392b'}];
+  document.getElementById('delay-bars').innerHTML=d.map(x=>`
+    <div class="bar-col">
+      <div class="bar-v">${x.v}</div>
+      <div class="bar-b" style="height:${Math.round(x.v/476*100)}px;background:${x.c};opacity:.85"></div>
+      <div class="bar-l">${x.l}</div>
+    </div>`).join('');
+}
+
+/* ═══════════════════════════════════════════════════════ */
+/*  CHART.JS — ANALYTICS PAGE CHARTS                       */
+/* ═══════════════════════════════════════════════════════ */
+
+const chartColors = {
+  blue: 'rgba(42, 138, 176, 0.85)',
+  blueFade: 'rgba(42, 138, 176, 0.15)',
+  green: 'rgba(22, 107, 62, 0.85)',
+  greenFade: 'rgba(22, 107, 62, 0.15)',
+  red: 'rgba(192, 57, 43, 0.85)',
+  redFade: 'rgba(192, 57, 43, 0.15)',
+  orange: 'rgba(212, 113, 26, 0.85)',
+  orangeFade: 'rgba(212, 113, 26, 0.15)',
+  purple: 'rgba(107, 63, 160, 0.85)',
+  purpleFade: 'rgba(107, 63, 160, 0.15)',
+  amber: 'rgba(212, 160, 23, 0.85)',
+  amberFade: 'rgba(212, 160, 23, 0.15)',
+};
+
+const defaultChartOpts = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      position: 'bottom',
+      labels: { font: { family: "'Inter', sans-serif", size: 12, weight: '500' }, padding: 16, usePointStyle: true, pointStyleWidth: 10 }
+    },
+    tooltip: {
+      backgroundColor: 'rgba(13,27,42,.92)',
+      titleFont: { family: "'Inter', sans-serif", size: 13, weight: '700' },
+      bodyFont: { family: "'JetBrains Mono', monospace", size: 12 },
+      padding: 12, cornerRadius: 8, displayColors: true
+    }
+  }
+};
+
+function destroyChart(id){
+  if(chartInstances[id]){chartInstances[id].destroy();delete chartInstances[id]}
+}
+
+function initAnalyticsCharts(){
+  animateCounters();
+  createRiskDistChart('doughnut');
+  createScreeningTrendChart();
+  createDistrictCompareChart();
+  createDomainRadarChart();
+  createReferralPipelineChart();
+  createAgeRiskChart();
+  createNutritionChart();
+  createOutcomeTrendChart();
+  createDQHistogramChart();
+}
+
+// 1. Risk Distribution (Doughnut / Pie / Polar)
+function createRiskDistChart(type){
+  destroyChart('risk-dist');
+  const ctx = document.getElementById('chart-risk-dist');
+  if(!ctx) return;
+  chartInstances['risk-dist'] = new Chart(ctx, {
+    type: type || 'doughnut',
+    data: {
+      labels: ['High Risk (8)', 'Medium Risk (279)', 'Low Risk (713)'],
+      datasets: [{
+        data: [8, 279, 713],
+        backgroundColor: [chartColors.red, chartColors.orange, chartColors.green],
+        borderColor: ['#fff','#fff','#fff'],
+        borderWidth: 3,
+        hoverOffset: 12
+      }]
+    },
+    options: {
+      ...defaultChartOpts,
+      cutout: type === 'doughnut' ? '55%' : undefined,
+      plugins: {
+        ...defaultChartOpts.plugins,
+        legend: { ...defaultChartOpts.plugins.legend, position: 'right' }
+      }
+    }
+  });
+}
+function switchRiskChart(type){
+  document.querySelectorAll('.chart-type-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  createRiskDistChart(type);
+}
+
+// 2. Monthly Screening Trends
+function createScreeningTrendChart(){
+  destroyChart('screening-trends');
+  const ctx = document.getElementById('chart-screening-trends');
+  if(!ctx) return;
+  chartInstances['screening-trends'] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+      datasets: [{
+        label: 'Children Screened',
+        data: [65,82,110,145,180,220,285,350,440,580,780,1000],
+        borderColor: chartColors.blue,
+        backgroundColor: chartColors.blueFade,
+        fill: true,
+        tension: 0.4,
+        pointRadius: 4,
+        pointHoverRadius: 7,
+        borderWidth: 2.5
+      },{
+        label: 'High Risk Identified',
+        data: [2,3,3,4,5,5,6,6,7,7,8,8],
+        borderColor: chartColors.red,
+        backgroundColor: chartColors.redFade,
+        fill: true,
+        tension: 0.4,
+        pointRadius: 4,
+        pointHoverRadius: 7,
+        borderWidth: 2.5,
+        yAxisID: 'y1'
+      }]
+    },
+    options: {
+      ...defaultChartOpts,
+      interaction: { mode: 'index', intersect: false },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { family: "'Inter'", size: 11 } } },
+        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,.05)' }, title: { display: true, text: 'Screened', font: { size: 11 } } },
+        y1: { position: 'right', beginAtZero: true, grid: { display: false }, title: { display: true, text: 'High Risk', font: { size: 11 } }, max: 15 }
+      }
+    }
+  });
+}
+
+// 3. District Performance Comparison
+function createDistrictCompareChart(){
+  destroyChart('district-compare');
+  const ctx = document.getElementById('chart-district-compare');
+  if(!ctx) return;
+  chartInstances['district-compare'] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Chittoor','Eluru','Guntur','Visakhapatnam'],
+      datasets: [
+        { label:'Screened', data:[255,257,234,254], backgroundColor:chartColors.blue, borderRadius:4 },
+        { label:'Pending Ref.', data:[130,128,120,135], backgroundColor:chartColors.orange, borderRadius:4 },
+        { label:'Improved', data:[120,122,108,122], backgroundColor:chartColors.green, borderRadius:4 },
+        { label:'Worsened', data:[26,25,22,25], backgroundColor:chartColors.red, borderRadius:4 }
+      ]
+    },
+    options: {
+      ...defaultChartOpts,
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { family: "'Inter'", size: 11 } } },
+        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,.05)' } }
+      }
+    }
+  });
+}
+
+// 4. Developmental Domain Radar
+function createDomainRadarChart(){
+  destroyChart('domain-radar');
+  const ctx = document.getElementById('chart-domain-radar');
+  if(!ctx) return;
+  chartInstances['domain-radar'] = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: ['Gross Motor','Fine Motor','Language & Comm.','Cognitive','Socio-Emotional'],
+      datasets: [{
+        label: 'Delay Prevalence (%)',
+        data: [14.6, 11.5, 18.2, 10.0, 13.7],
+        backgroundColor: 'rgba(192,57,43,.12)',
+        borderColor: chartColors.red,
+        pointBackgroundColor: chartColors.red,
+        pointHoverRadius: 8,
+        borderWidth: 2.5
+      },{
+        label: 'Post-Intervention (%)',
+        data: [10.2, 8.1, 13.5, 7.8, 9.4],
+        backgroundColor: 'rgba(22,107,62,.12)',
+        borderColor: chartColors.green,
+        pointBackgroundColor: chartColors.green,
+        pointHoverRadius: 8,
+        borderWidth: 2.5
+      }]
+    },
+    options: {
+      ...defaultChartOpts,
+      scales: {
+        r: {
+          beginAtZero: true,
+          max: 25,
+          ticks: { stepSize: 5, font: { size: 10 }, backdropColor: 'transparent' },
+          grid: { color: 'rgba(0,0,0,.07)' },
+          pointLabels: { font: { family: "'Inter'", size: 11, weight: '600' } }
+        }
+      }
+    }
+  });
+}
+
+// 5. Referral Pipeline
+function createReferralPipelineChart(){
+  destroyChart('referral-pipeline');
+  const ctx = document.getElementById('chart-referral-pipeline');
+  if(!ctx) return;
+  chartInstances['referral-pipeline'] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Pending','Completed','Under Treatment','Triggered (Yes)'],
+      datasets: [{
+        data: [513, 299, 188, 263],
+        backgroundColor: [chartColors.amber, chartColors.green, chartColors.purple, chartColors.orange],
+        borderRadius: 6,
+        barThickness: 48
+      }]
+    },
+    options: {
+      ...defaultChartOpts,
+      indexAxis: 'y',
+      plugins: { ...defaultChartOpts.plugins, legend: { display: false } },
+      scales: {
+        x: { beginAtZero: true, grid: { color: 'rgba(0,0,0,.05)' } },
+        y: { grid: { display: false }, ticks: { font: { family: "'Inter'", size: 12, weight: '600' } } }
+      }
+    }
+  });
+}
+
+// 6. Age-wise Risk Distribution
+function createAgeRiskChart(){
+  destroyChart('age-risk');
+  const ctx = document.getElementById('chart-age-risk');
+  if(!ctx) return;
+  chartInstances['age-risk'] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['0–1 year','1–3 years','3–6 years'],
+      datasets: [
+        { label:'High Risk', data:[2,4,2], backgroundColor:chartColors.red, borderRadius:4 },
+        { label:'Medium Risk', data:[46,90,143], backgroundColor:chartColors.orange, borderRadius:4 },
+        { label:'Low Risk', data:[124,259,330], backgroundColor:chartColors.green, borderRadius:4 }
+      ]
+    },
+    options: {
+      ...defaultChartOpts,
+      plugins: { ...defaultChartOpts.plugins },
+      scales: {
+        x: { stacked: true, grid: { display: false }, ticks: { font: { family: "'Inter'", size: 12, weight: '600' } } },
+        y: { stacked: true, beginAtZero: true, grid: { color: 'rgba(0,0,0,.05)' } }
+      }
+    }
+  });
+}
+
+// 7. Nutritional Risk Profile
+function createNutritionChart(){
+  destroyChart('nutrition');
+  const ctx = document.getElementById('chart-nutrition');
+  if(!ctx) return;
+  chartInstances['nutrition'] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Anaemia','Underweight','Stunting','Wasting'],
+      datasets: [{
+        label: 'Children Affected',
+        data: [268, 190, 138, 108],
+        backgroundColor: [
+          'rgba(192,57,43,.8)',
+          'rgba(212,113,26,.8)',
+          'rgba(212,160,23,.8)',
+          'rgba(107,63,160,.8)'
+        ],
+        borderRadius: 6,
+        barThickness: 52
+      }]
+    },
+    options: {
+      ...defaultChartOpts,
+      plugins: {
+        ...defaultChartOpts.plugins,
+        legend: { display: false }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { family: "'Inter'", size: 12, weight: '600' } } },
+        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,.05)' }, title: { display: true, text: 'Children', font: { size: 11 } } }
+      }
+    }
+  });
+}
+
+// 8. Intervention Outcome Tracking
+function createOutcomeTrendChart(){
+  destroyChart('outcome-trend');
+  const ctx = document.getElementById('chart-outcome-trend');
+  if(!ctx) return;
+  chartInstances['outcome-trend'] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Baseline','Month 1','Month 2','Month 3','Month 4','Month 5','Month 6'],
+      datasets: [{
+        label: 'Avg DQ (Intervention Group)',
+        data: [87.5, 89.2, 91.0, 92.8, 94.1, 95.2, 95.8],
+        borderColor: chartColors.green,
+        backgroundColor: chartColors.greenFade,
+        fill: true,
+        tension: 0.3,
+        pointRadius: 5,
+        borderWidth: 2.5
+      },{
+        label: 'Avg DQ (Control Group)',
+        data: [87.5, 87.8, 88.0, 88.2, 88.1, 88.3, 88.5],
+        borderColor: chartColors.orange,
+        backgroundColor: chartColors.orangeFade,
+        fill: true,
+        tension: 0.3,
+        pointRadius: 5,
+        borderWidth: 2.5,
+        borderDash: [6,3]
+      }]
+    },
+    options: {
+      ...defaultChartOpts,
+      interaction: { mode: 'index', intersect: false },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { family: "'Inter'", size: 11 } } },
+        y: { min: 85, max: 100, grid: { color: 'rgba(0,0,0,.05)' }, title: { display: true, text: 'DQ Score', font: { size: 11 } } }
+      }
+    }
+  });
+}
+
+// 9. DQ Histogram
+function createDQHistogramChart(){
+  destroyChart('dq-histogram');
+  const ctx = document.getElementById('chart-dq-histogram');
+  if(!ctx) return;
+  const bins = ['<65','65-70','70-75','75-80','80-85','85-90','90-95','95-100','100-105','105-110','>110'];
+  const counts = [5, 12, 28, 52, 85, 145, 198, 225, 158, 72, 20];
+  chartInstances['dq-histogram'] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: bins,
+      datasets: [{
+        label: 'Number of Children',
+        data: counts,
+        backgroundColor: counts.map(v => v > 150 ? chartColors.blue : v > 80 ? 'rgba(42,138,176,.6)' : 'rgba(42,138,176,.35)'),
+        borderRadius: 4,
+        barPercentage: 0.9,
+        categoryPercentage: 0.95
+      }]
+    },
+    options: {
+      ...defaultChartOpts,
+      plugins: {
+        ...defaultChartOpts.plugins,
+        legend: { display: false },
+        annotation: {}
+      },
+      scales: {
+        x: { grid: { display: false }, title: { display: true, text: 'DQ Score Range', font: { size: 12, weight: '600' } }, ticks: { font: { family: "'Inter'", size: 11, weight: '500' } } },
+        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,.05)' }, title: { display: true, text: 'Number of Children', font: { size: 12, weight: '600' } } }
+      }
+    }
+  });
+}
+
+function updateAnalyticsCharts(){
+  // Re-render with filter applied (visual indicator)
+  toast('Charts updated with filter','success');
+  // Could filter data by district here for real implementation
+  initAnalyticsCharts();
+}
+
+function exportAnalytics(){
+  toast('Exporting charts as images…','success');
+  // In production: canvas.toDataURL() per chart and package as ZIP
+  setTimeout(()=>toast('Charts exported successfully!','success'),1500);
+}
+
+/* ═══════════════════════════════════════════════════════ */
+/*  CHART.JS — REPORTS PAGE CHARTS                         */
+/* ═══════════════════════════════════════════════════════ */
+
+function initReportCharts(){
+  createReportTrendChart();
+  createReportRankingChart();
+}
+
+function createReportTrendChart(){
+  destroyChart('report-trend');
+  const ctx = document.getElementById('chart-report-trend');
+  if(!ctx) return;
+  chartInstances['report-trend'] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Q1 2025','Q2 2025','Q3 2025','Q4 2025'],
+      datasets: [{
+        label: 'Screening Rate (%)',
+        data: [45, 62, 78, 100],
+        borderColor: chartColors.blue,
+        backgroundColor: chartColors.blueFade,
+        fill: true, tension: 0.4, pointRadius: 6, borderWidth: 3
+      },{
+        label: 'Improvement Rate (%)',
+        data: [28, 35, 41, 47.2],
+        borderColor: chartColors.green,
+        backgroundColor: chartColors.greenFade,
+        fill: true, tension: 0.4, pointRadius: 6, borderWidth: 3
+      },{
+        label: 'Follow-up Rate (%)',
+        data: [15, 20, 24, 29.4],
+        borderColor: chartColors.orange,
+        backgroundColor: chartColors.orangeFade,
+        fill: true, tension: 0.4, pointRadius: 6, borderWidth: 3
+      }]
+    },
+    options: {
+      ...defaultChartOpts,
+      interaction: { mode: 'index', intersect: false },
+      scales: {
+        x: { grid: { display: false } },
+        y: { beginAtZero: true, max: 110, grid: { color: 'rgba(0,0,0,.05)' }, title: { display: true, text: 'Percentage (%)', font: { size: 11 } } }
+      }
+    }
+  });
+}
+
+function createReportRankingChart(){
+  destroyChart('report-ranking');
+  const ctx = document.getElementById('chart-report-ranking');
+  if(!ctx) return;
+  // Composite score = (screening*0.3 + improvement*0.3 + followup*0.2 + (100-worsened)*0.2)
+  const scores = DIST.map(d => ({
+    name: d.name,
+    score: Math.round((d.sc/257*100)*0.3 + (d.impr/d.sc*100)*0.3 + d.fuRate*0.2 + (100-d.wor/d.sc*100)*0.2)
+  })).sort((a,b) => b.score - a.score);
+
+  chartInstances['report-ranking'] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: scores.map(s=>s.name),
+      datasets: [{
+        label: 'Composite Performance Score',
+        data: scores.map(s=>s.score),
+        backgroundColor: scores.map((_,i) => i===0 ? chartColors.green : i===1 ? chartColors.blue : i===2 ? chartColors.orange : chartColors.purple),
+        borderRadius: 6,
+        barThickness: 48
+      }]
+    },
+    options: {
+      ...defaultChartOpts,
+      indexAxis: 'y',
+      plugins: { ...defaultChartOpts.plugins, legend: { display: false } },
+      scales: {
+        x: { beginAtZero: true, max: 100, grid: { color: 'rgba(0,0,0,.05)' }, title: { display: true, text: 'Score (out of 100)', font: { size: 11 } } },
+        y: { grid: { display: false }, ticks: { font: { family: "'Inter'", size: 13, weight: '700' } } }
+      }
+    }
+  });
+}
+
+function renderReportTable(){
+  const tbody = document.getElementById('report-table-body');
+  if(!tbody) return;
+  tbody.innerHTML = DIST.map(d=>`
+    <tr>
+      <td style="font-weight:700">${d.name}</td>
+      <td class="mono">${d.sc}</td>
+      <td><span class="badge ${d.hi>2?'bg-critical':'bg-low'}">${d.hi}</span></td>
+      <td class="mono">${d.med}</td>
+      <td class="mono">${d.low}</td>
+      <td class="mono" style="color:${d.pend>130?'#c0392b':'var(--txt)'}">${d.pend}</td>
+      <td class="mono">${d.comp}%</td>
+      <td class="mono">${Math.round(d.sc*0.188)}</td>
+      <td><span class="badge bg-improved">${d.impr}</span></td>
+      <td><span class="badge bg-worsened">${d.wor}</span></td>
+      <td class="mono" style="font-weight:700">${d.avgDq}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="flex:1;background:var(--bg);border-radius:4px;height:8px;overflow:hidden">
+            <div style="width:${d.fuRate}%;height:100%;background:${d.fuRate<30?'linear-gradient(90deg,#d4711a,#e67e22)':'linear-gradient(90deg,#166b3e,#1a9d57)'};border-radius:3px"></div>
+          </div>
+          <span class="mono" style="font-size:11px;font-weight:700">${d.fuRate}%</span>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function updateReportView(){
+  const type = document.getElementById('report-type').value;
+  toast(`Loading ${type} report…`);
+}
+
+function generateReport(){
+  toast('Generating comprehensive report…','success');
+  setTimeout(()=>toast('Report generated successfully!','success'),2000);
+}
+
+function printReport(){
+  window.print();
+}
+
+function downloadCSV(){
+  const headers = 'District,Screened,High Risk,Medium Risk,Low Risk,Pending Ref,Completed %,Under Treatment,Improved,Worsened,Avg DQ,Follow-up %';
+  const rows = DIST.map(d=>`${d.name},${d.sc},${d.hi},${d.med},${d.low},${d.pend},${d.comp},${Math.round(d.sc*0.188)},${d.impr},${d.wor},${d.avgDq},${d.fuRate}`);
+  const csv = [headers,...rows].join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'ICDS_Report_AP_2025.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('CSV downloaded!','success');
+}
+
+/* ═══════════════════════════════════════════════════════ */
+/*  MODAL / TOAST                                          */
+/* ═══════════════════════════════════════════════════════ */
+
+function openModal(){document.getElementById('modal').classList.add('open')}
+function closeModal(){document.getElementById('modal').classList.remove('open')}
+function saveUpd(){closeModal();toast('Intervention status updated successfully','success')}
+
+function toast(msg, type){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast' + (type ? ' '+type : '');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+</script>
+</body>
+</html>
